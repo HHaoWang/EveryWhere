@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "EveryWhere.Desktop (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "EveryWhere.Desktop (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
