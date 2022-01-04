@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveryWhere.Desktop", "Every
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveryWhere.FileConvert", "EveryWhere.FileConvert\EveryWhere.FileConvert.csproj", "{F8299883-6675-4859-8693-9B19136E2E8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EveryWhere.DTO", "EveryWhere.DTO\EveryWhere.DTO.csproj", "{C7AAFC06-BEA6-412B-9129-F5F36BCA0579}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveryWhere.DTO", "EveryWhere.DTO\EveryWhere.DTO.csproj", "{C7AAFC06-BEA6-412B-9129-F5F36BCA0579}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{98855BD5-E59A-4A4D-8DDE-A83CB50E77F6}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
