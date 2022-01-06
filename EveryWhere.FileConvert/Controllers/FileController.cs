@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
-namespace EveryWhere.FileConvert.Controllers
+namespace EveryWhere.FileServer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

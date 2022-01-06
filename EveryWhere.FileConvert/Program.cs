@@ -1,9 +1,21 @@
 using EveryWhere.DTO.Settings;
+using EveryWhere.FileServer.Utils;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 #region 添加服务
+
+//添加Log服务
+builder.Host.UseSerilog((context, logger) =>
+{
+    logger.ReadFrom.Configuration(context.Configuration);
+    logger.WriteTo.File(Path.Combine(FileUtil.GetLogDirectory().FullName, "FileServer", "log.txt"),
+        rollingInterval: RollingInterval.Day,
+        shared: true,
+        retainedFileCountLimit: null);
+});
 
 //添加token配置服务
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("tokenConfig"));
@@ -25,6 +37,8 @@ var app = builder.Build();
 
 #region 配置管道
 
+app.UseSerilogRequestLogging();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -33,10 +47,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
-
 #endregion
+
+app.Run();

@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "EveryWhere.FileConvert": {
+    "EveryWhere.FileServer": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

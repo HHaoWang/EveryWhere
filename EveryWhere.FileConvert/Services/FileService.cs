@@ -1,4 +1,4 @@
-﻿namespace EveryWhere.FileConvert.Services
+﻿namespace EveryWhere.FileServer.Services
 {
     public class FileService
     {
