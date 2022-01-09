@@ -32,6 +32,10 @@ public class File
     public DateTime CreateTime { get; set; }
 
     [Required]
+    [Column("job_sequence",TypeName = "int(11)")]
+    public int JobSequence { get; set; }
+
+    [Required]
     [Column("order_id", TypeName = "int(11)")]
     public int OrderId { get; set; }
 

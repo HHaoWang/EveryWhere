@@ -4,6 +4,10 @@ using EveryWhere.FileServer.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Microsoft.EntityFrameworkCore;
+using EveryWhere.Database;
+using EveryWhere.FileServer.Contexts.FileProvider;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,7 +67,27 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//添加数据库服务
+builder.Services.AddDbContext<Repository>(
+    dbContextOptions => dbContextOptions
+        .UseMySql(
+            builder.Configuration.GetConnectionString("FileServerContext"),
+            new MySqlServerVersion(new Version(5, 7))
+        )
+        .EnableDetailedErrors()
+        .ConfigureWarnings(b =>
+        {
+            //把sql语句输出日志提升到debug级别
+            b.Log(
+                (RelationalEventId.CommandExecuted, LogLevel.Debug),
+                (RelationalEventId.ConnectionOpening, LogLevel.Debug)
+            );
+        })
+);
 
+//注入项目服务
+builder.Services.AddScoped<FileProviderService, FileProviderService>();
+builder.Services.AddScoped<FileProviderRepo, FileProviderRepo>();
 
 #endregion
 

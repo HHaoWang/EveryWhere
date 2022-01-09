@@ -1,13 +1,25 @@
-﻿namespace EveryWhere.FileServer.Contexts.FileProvider
-{
-    public class FileProvider
-    {
-        protected int OrderId { get; set; }
-        protected List<FileInfo> Files { get; set; }
+﻿using EveryWhere.FileServer.Contexts.FileProvider.Exception;
+using File = EveryWhere.FileServer.Contexts.FileProvider.Entity.File;
 
-        public FileProvider()
+namespace EveryWhere.FileServer.Contexts.FileProvider;
+
+public class FileProvider
+{
+    private List<File> Files { get; }
+
+    public FileProvider(List<File> files)
+    {
+        this.Files = files;
+    }
+
+    internal FileInfo GetJobFile(int jobSequence)
+    {
+        var file = Files.FirstOrDefault(f=> f.JobSequence == jobSequence);
+        if (file is null)
         {
-            Files = new List<FileInfo>();
+            throw new JobFileNotFoundException();
         }
+
+        return file.FileInfo;
     }
 }

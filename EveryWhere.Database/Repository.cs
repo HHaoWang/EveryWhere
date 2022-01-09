@@ -11,10 +11,17 @@ public class Repository : DbContext
     public virtual DbSet<PO.File> File { get; set; }
     public virtual DbSet<PO.Order> Order { get; set; }
 
+    public Repository(){}
+
+    public Repository(DbContextOptions options) : base(options)
+    {
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
         {
+            //仅用于开发时快速修改数据库而配置，二次开发需要修改下方参数
             optionsBuilder.UseMySql("server = 127.0.0.1; uid = EveryWhere; pwd = EveryWhere; database = every_where", 
                 ServerVersion.Parse("5.7.26-mysql"));
         }
