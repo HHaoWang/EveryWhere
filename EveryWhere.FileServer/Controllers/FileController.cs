@@ -28,7 +28,6 @@ namespace EveryWhere.FileServer.Controllers
                 return BadRequest(d);
             }
 
-
             return new JsonResult(new { statusCode = 200, data = new { savedFileName = "/api/Article/Img/" } });
         }
     }

@@ -1,6 +1,8 @@
+using System.Text;
 using EveryWhere.DTO.Settings;
 using EveryWhere.FileServer.Utils;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,13 +25,45 @@ builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("toke
 var sec = builder.Configuration.GetSection("tokenConfig");
 var tokenSettings = ConfigurationBinder.Get<TokenSettings>(sec);
 
+//添加jwt验证
+builder.Services.AddAuthentication(option =>
+{
+    option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(option =>
+{
+    option.SaveToken = true;
+    option.TokenValidationParameters = new TokenValidationParameters
+    {
+        //校验盐值
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSettings.SaltValue)),
+        //校验签发者
+        ValidateIssuer = true,
+        ValidIssuer = tokenSettings.Issuer,
+        //校验验证者
+        ValidateAudience = true,
+        ValidAudience = tokenSettings.Audience,
+        //校验过期时间
+        ValidateLifetime = true
+    };
+});
+
 //添加 发送网络请求服务
 builder.Services.AddHttpClient();
+
+//使用newtonsoftJson进行处理
+builder.Services.AddControllers().AddNewtonsoftJson(option => {
+    option.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 #endregion
 
