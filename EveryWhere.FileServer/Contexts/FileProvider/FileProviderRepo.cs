@@ -1,5 +1,6 @@
 ﻿using EveryWhere.Database;
 using EveryWhere.FileServer.Utils;
+using Microsoft.EntityFrameworkCore;
 using File = EveryWhere.Database.PO.File;
 
 namespace EveryWhere.FileServer.Contexts.FileProvider;
@@ -16,6 +17,7 @@ public class FileProviderRepo
     public FileProvider GetFileProvider(int orderId)
     {
         List<File> files = _repository.File.Where(file => file.OrderId == orderId)
+            .Include(f => f.PrintJob)
             .ToList();
 
         List<Entity.File> fileInfos = new List<Entity.File>();
@@ -24,7 +26,7 @@ public class FileProviderRepo
         {
             fileInfos.Add(new Entity.File()
             {
-                JobSequence = file.JobSequence,
+                JobSequence = file.PrintJob.JobSequence,
                 FileInfo = new FileInfo(Path.Combine(fileDirectoryPath, file.Name))
             });
         }

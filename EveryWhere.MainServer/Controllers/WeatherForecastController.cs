@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace EveryWhere.API.Controllers
+namespace EveryWhere.MainServer.Controllers
 {
     [ApiController]
     [Route("[controller]")]

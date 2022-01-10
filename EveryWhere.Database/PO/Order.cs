@@ -23,6 +23,8 @@ public class Order
 
     public List<File> Files { get; set; }
 
+    public List<PrintJob> PrintJobs { get; set; }
+
     public enum StatusState
     {
         NotUploaded,

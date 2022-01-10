@@ -1,4 +1,4 @@
-namespace EveryWhere.API
+namespace EveryWhere.MainServer
 {
     public class WeatherForecast
     {

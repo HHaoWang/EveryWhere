@@ -32,13 +32,16 @@ public class File
     public DateTime CreateTime { get; set; }
 
     [Required]
-    [Column("job_sequence",TypeName = "int(11)")]
-    public int JobSequence { get; set; }
-
-    [Required]
     [Column("order_id", TypeName = "int(11)")]
     public int OrderId { get; set; }
 
     [ForeignKey("OrderId")]
     public Order Order { get; set; }
+
+    [Required]
+    [Column("print_job_id", TypeName = "int(11)")]
+    public int PrintJobId { get; set; }
+
+    [ForeignKey("PrintJobId")]
+    public PrintJob PrintJob { get; set; }
 }
