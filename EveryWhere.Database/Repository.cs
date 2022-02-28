@@ -45,5 +45,29 @@ public class Repository : DbContext
             entity.Property(e => e.CreateTime)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
+
+        modelBuilder.Entity<PO.Consumer>(entity =>
+        {
+            entity.Property(e => e.CreateTime)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+
+        modelBuilder.Entity<PO.Printer>(entity =>
+        {
+            entity.Property(e => e.CreateTime)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+
+        modelBuilder.Entity<PO.PrintJob>(entity =>
+        {
+            entity.Property(e => e.CreateTime)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+
+        modelBuilder.Entity<PO.Shop>(entity =>
+        {
+            entity.Property(e => e.CreateTime)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
     }
 }

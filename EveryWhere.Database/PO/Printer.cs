@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EveryWhere.Database.PO;
 
+[Table("printer")]
 public class Printer
 {
     [Required]
@@ -38,4 +39,8 @@ public class Printer
 
     [ForeignKey("ShopId")]
     public Shop Shop { get; set; }
+
+    [Required]
+    [Column("create_time", TypeName = "datetime")]
+    public DateTime CreateTime { get; set; }
 }

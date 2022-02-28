@@ -28,5 +28,9 @@ public class Shop
     [Comment("店铺位置描述")]
     public string LocationDescription { get; set; }
 
+    [Required]
+    [Column("create_time", TypeName = "datetime")]
+    public DateTime CreateTime { get; set; }
+
     public List<Printer> Printers { get; set; }
 }

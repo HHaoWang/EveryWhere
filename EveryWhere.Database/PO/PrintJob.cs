@@ -38,6 +38,10 @@ public class PrintJob
     [Column("status", TypeName = "ENUM('NotUploaded','UploadFailed','Converting','Uploaded','Queuing','Printing','NotTaken','Finish')")]
     public StatusState Status { get; set; }
 
+    [Required]
+    [Column("create_time", TypeName = "datetime")]
+    public DateTime CreateTime { get; set; }
+
     public enum StatusState
     {
         NotUploaded,

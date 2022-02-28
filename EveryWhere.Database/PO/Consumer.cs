@@ -37,4 +37,8 @@ public class Consumer
     [Column("wechat_session_key", TypeName = "varchar(120)")]
     [Comment("微信下发的sessionKey")]
     public string WechatSessionKey { get; set; }
+
+    [Required]
+    [Column("create_time", TypeName = "datetime")]
+    public DateTime CreateTime { get; set; }
 }
