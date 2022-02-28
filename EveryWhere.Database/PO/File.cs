@@ -21,10 +21,12 @@ public class File
 
     [Required]
     [Column("name",TypeName = "varchar(50)")]
+    [Comment("在服务器上的文件名")]
     public string Name { get; set; }
 
     [Required]
     [Column("original_name",TypeName = "varchar(50)")]
+    [Comment("文件上传时的原始名称")]
     public string OriginalName { get; set; }
 
     [Required]

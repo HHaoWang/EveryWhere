@@ -25,6 +25,20 @@ public class Order
 
     public List<PrintJob> PrintJobs { get; set; }
 
+    [Required]
+    [Column("consumer_id",TypeName = "int(11)")]
+    public int ConsumerId { get; set; }
+
+    [ForeignKey("ConsumerId")]
+    public Consumer Consumer { get; set; }
+
+    [Required]
+    [Column("shop_id", TypeName = "int(11)")]
+    public int ShopId { get; set; }
+
+    [ForeignKey("ShopId")]
+    public Shop Shop { get; set; }
+
     public enum StatusState
     {
         NotUploaded,

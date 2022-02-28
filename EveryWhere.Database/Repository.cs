@@ -9,7 +9,11 @@ namespace EveryWhere.Database;
 public class Repository : DbContext
 {
     public virtual DbSet<PO.File> File { get; set; }
-    public virtual DbSet<PO.Order> Order { get; set; }
+    public virtual DbSet<PO.Order> Orders { get; set; }
+    public virtual DbSet<PO.Consumer> Consumers { get; set; }
+    public virtual DbSet<PO.PrintJob> PrintJobs { get; set; }
+    public virtual DbSet<PO.Printer> Printers { get; set; }
+    public virtual DbSet<PO.Shop> Shops { get; set; }
 
     public Repository(){}
 

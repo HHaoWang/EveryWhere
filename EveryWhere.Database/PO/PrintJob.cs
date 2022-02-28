@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace EveryWhere.Database.PO;
 
@@ -20,10 +21,12 @@ public class PrintJob
 
     [Required]
     [Column("job_sequence", TypeName = "int(11)")]
+    [Comment("打印顺序")]
     public int JobSequence { get; set; }
 
     [Required]
     [Column("order_id", TypeName = "int(11)")]
+    [Comment("订单号")]
     public int OrderId { get; set; }
 
     [ForeignKey("OrderId")]
