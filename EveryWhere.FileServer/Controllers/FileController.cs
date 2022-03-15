@@ -14,18 +14,21 @@ namespace EveryWhere.FileServer.Controllers;
 public class FileController : ControllerBase
 {
     private readonly long _fileSizeLimit;
-    private readonly FileProviderService _fileProviderService;
+    private readonly OrderFileProviderService _fileProviderService;
+    private readonly ILogger<FileController> _logger;
 
-    public FileController(IConfiguration config,FileProviderService service)
+    public FileController(IConfiguration config, OrderFileProviderService service, ILogger<FileController> logger)
     {
         _fileSizeLimit = config.GetValue<long>("FileSizeLimit");
         _fileProviderService = service;
+        this._logger = logger;
     }
 
-    [Authorize]
     [HttpPost]
-    [Route("Upload")]
-    public IActionResult Upload([Required] IFormFile file)
+    [Route("Upload/orderId/{orderId}/jobSequence/{jobSequence}")]
+    public IActionResult Upload([Required] IFormFile file,
+        [Required] int orderId,
+        [Required] int jobSequence)
     {
         if (file.Length > _fileSizeLimit)
         {
@@ -34,7 +37,17 @@ public class FileController : ControllerBase
             return BadRequest(d);
         }
 
-        return new JsonResult(new { statusCode = 200, data = new { savedFileName = "/api/Article/Img/" } });
+        _logger.LogInformation(orderId + "" + jobSequence);
+
+        _fileProviderService.CreateJobFile(new JobFileAddition()
+        {
+            FileStream = file.OpenReadStream(),
+            JobSequence = jobSequence,
+            OrderId = orderId,
+            OriginalName = file.FileName
+        });
+
+        return Ok();
     }
 
     [HttpGet]
@@ -42,7 +55,27 @@ public class FileController : ControllerBase
     {
         try
         {
-            FileInfo fileInfo = _fileProviderService.GetOrderJobFile(new FileRequirement(1, orderId, jobSequence));
+            FileInfo fileInfo = _fileProviderService.GetOrderJobFile(new JobFileRequirement(1, orderId, jobSequence));
+            var stream = System.IO.File.OpenRead(fileInfo.FullName);
+            return File(stream, MimeTypesMap.GetMimeType(fileInfo.Name), fileInfo.Name);
+        }
+        catch (JobFileNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (FileNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpGet]
+    [Route("Printer/{printerId}/Lastest")]
+    public IActionResult GetFileByPrinter([Required] int printerId)
+    {
+        try
+        {
+            FileInfo fileInfo = _fileProviderService.GetPrinterJobFile(printerId);
             var stream = System.IO.File.OpenRead(fileInfo.FullName);
             return File(stream, MimeTypesMap.GetMimeType(fileInfo.Name), fileInfo.Name);
         }

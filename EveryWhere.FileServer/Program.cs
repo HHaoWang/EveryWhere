@@ -1,6 +1,6 @@
 using System.Text;
 using EveryWhere.DTO.Settings;
-using EveryWhere.FileServer.Utils;
+using EveryWhere.Util;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using EveryWhere.Database;
 using EveryWhere.FileServer.Contexts.FileProvider;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using EveryWhere.DTO.MessageQueue;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,9 @@ builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("toke
 //实例化token配置
 var sec = builder.Configuration.GetSection("tokenConfig");
 var tokenSettings = ConfigurationBinder.Get<TokenSettings>(sec);
+
+//添加消息队列服务配置
+builder.Services.Configure<MessageQueueSettings>(builder.Configuration.GetSection("MessageQueue"));
 
 //添加jwt验证
 builder.Services.AddAuthentication(option =>
@@ -86,8 +91,9 @@ builder.Services.AddDbContext<Repository>(
 );
 
 //注入项目服务
-builder.Services.AddScoped<FileProviderService, FileProviderService>();
-builder.Services.AddScoped<FileProviderRepo, FileProviderRepo>();
+builder.Services.AddScoped<OrderFileProviderService, OrderFileProviderService>();
+builder.Services.AddScoped<OrderFileProviderRepo, OrderFileProviderRepo>();
+builder.Services.AddScoped<FileConvertNotifyFacade, FileConvertNotifyFacade>();
 
 #endregion
 

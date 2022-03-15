@@ -10,6 +10,9 @@ public class Repository : DbContext
 {
     public virtual DbSet<PO.File> File { get; set; }
     public virtual DbSet<PO.Order> Order { get; set; }
+    public virtual DbSet<PO.PrintJob> PrintJob { get; set; }
+    public virtual DbSet<PO.Printer> Printer { get; set; }
+    public virtual DbSet<PO.Shop> Shop { get; set; }
 
     public Repository(){}
 
@@ -40,6 +43,22 @@ public class Repository : DbContext
         {
             entity.Property(e => e.CreateTime)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+
+        modelBuilder.Entity<PO.Printer>(entity =>
+        {
+            entity.Property(e => e.CreateTime)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+
+        modelBuilder.Entity<PO.Shop>(entity =>
+        {
+            entity.Property(e => e.CreateTime)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.Property(e => e.UpdateTime)
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
     }
 }

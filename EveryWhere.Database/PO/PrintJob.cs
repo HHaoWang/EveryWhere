@@ -32,15 +32,22 @@ public class PrintJob
     public File File { get; set; }
 
     [Required]
-    [Column("status", TypeName = "ENUM('NotUploaded','UploadFailed','Converting','Uploaded','Queuing','Printing','NotTaken','Finish')")]
+    [Column("printer_id", TypeName = "int(11)")]
+    public int PrinterId { get; set; }
+
+    [ForeignKey("PrinterId")]
+    public Printer Printer { get; set; }
+
+    [Required]
+    [Column("status", TypeName = "ENUM('NotUploaded','UploadFailed','Uploaded','Converting','Queuing','Printing','NotTaken','Finish')")]
     public StatusState Status { get; set; }
 
     public enum StatusState
     {
         NotUploaded,
         UploadFailed,
-        Converting,
         Uploaded,
+        Converting,
         Queuing,
         Printing,
         NotTaken,

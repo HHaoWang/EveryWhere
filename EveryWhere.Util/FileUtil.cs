@@ -1,4 +1,4 @@
-﻿namespace EveryWhere.FileServer.Utils;
+﻿namespace EveryWhere.Util;
 
 public static class FileUtil
 {
@@ -34,10 +34,25 @@ public static class FileUtil
     }
 
     /// <summary>
-    /// 获取下发文件存放路径
+    /// 获取上传文件存放路径
     /// </summary>
-    /// <returns>完整的下发文件存放路径</returns>
+    /// <returns>完整的上传文件存放路径</returns>
     public static DirectoryInfo GetFileDirectory()
+    {
+        DirectoryInfo sourceDirectory = GetSourceDirectory();
+        DirectoryInfo directory = new DirectoryInfo(Path.Combine(sourceDirectory.FullName, "notConvertedFile"));
+        if (!directory.Exists)
+        {
+            directory.Create();
+        }
+        return directory;
+    }
+
+    /// <summary>
+    /// 获取转换完成的文件存放路径
+    /// </summary>
+    /// <returns>完整的转换完成的文件存放路径</returns>
+    public static DirectoryInfo GetConvertedFileDirectory()
     {
         DirectoryInfo sourceDirectory = GetSourceDirectory();
         DirectoryInfo directory = new DirectoryInfo(Path.Combine(sourceDirectory.FullName, "convertedFile"));

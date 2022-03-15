@@ -20,7 +20,7 @@ public class File
     public int Id { get; set; }
 
     [Required]
-    [Column("name",TypeName = "varchar(50)")]
+    [Column("name",TypeName = "varchar(100)")]
     public string Name { get; set; }
 
     [Required]
@@ -30,13 +30,6 @@ public class File
     [Required]
     [Column("create_time",TypeName = "datetime")]
     public DateTime CreateTime { get; set; }
-
-    [Required]
-    [Column("order_id", TypeName = "int(11)")]
-    public int OrderId { get; set; }
-
-    [ForeignKey("OrderId")]
-    public Order Order { get; set; }
 
     [Required]
     [Column("print_job_id", TypeName = "int(11)")]
