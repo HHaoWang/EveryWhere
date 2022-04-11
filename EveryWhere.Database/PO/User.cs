@@ -11,17 +11,22 @@ namespace EveryWhere.Database.PO;
 
 #nullable disable
 
-[Table("consumer")]
-public class Consumer
+[Table("user")]
+public class User
 {
     [Required]
     [Column("id", TypeName = "int(11)")]
     public int Id { get; set; }
 
     [Required]
-    [Column("nick_name",TypeName = "varchar(30)")]
+    [Column("nick_name",TypeName = "varchar(120)")]
     [Comment("昵称")]
     public string NickName { get; set; }
+
+    [Required]
+    [Column("tel", TypeName = "varchar(11)")]
+    [Comment("电话号")]
+    public string Tel { get; set; }
 
     [Required]
     [Column("wechat_open_id",TypeName = "varchar(120)")]
@@ -39,6 +44,17 @@ public class Consumer
     public string WechatSessionKey { get; set; }
 
     [Required]
+    [Column("is_manager", TypeName = "tinyint(1)")]
+    [Comment("是否是管理者")]
+    public bool IsManager { get; set; }
+
+    [Required]
     [Column("create_time", TypeName = "datetime")]
     public DateTime CreateTime { get; set; }
+
+    #region 关联实体
+
+    public List<Order> Orders { get; set; }
+
+    #endregion
 }

@@ -20,30 +20,47 @@ public class File
     public int Id { get; set; }
 
     [Required]
-    [Column("name",TypeName = "varchar(50)")]
-    [Comment("在服务器上的文件名")]
-    public string Name { get; set; }
+    [Column("create_time", TypeName = "datetime")]
+    [Comment("上传时间")]
+    public DateTime CreateTime { get; set; }
 
     [Required]
-    [Column("original_name",TypeName = "varchar(50)")]
+    [Column("uploader_id", TypeName = "int(11)")]
+    public int UploaderId { get; set; }
+
+    [Required]
+    [Column("size", TypeName = "float(8,2)")]
+    [Comment("文件大小")]
+    public float Size { get; set; }
+
+    [Required]
+    [Column("original_name", TypeName = "varchar(120)")]
     [Comment("文件上传时的原始名称")]
     public string OriginalName { get; set; }
 
     [Required]
-    [Column("create_time",TypeName = "datetime")]
-    public DateTime CreateTime { get; set; }
+    [Column("name",TypeName = "varchar(120)")]
+    [Comment("在服务器上的文件名")]
+    public string Name { get; set; }
 
     [Required]
-    [Column("order_id", TypeName = "int(11)")]
-    public int OrderId { get; set; }
+    [Column("location", TypeName = "varchar(120)")]
+    [Comment("存放位置")]
+    public string Location { get; set; }
 
-    [ForeignKey("OrderId")]
-    public Order Order { get; set; }
+    [Column("page_count", TypeName = "int")]
+    [Comment("页数")]
+    public int PageCount { get; set; }
 
     [Required]
-    [Column("print_job_id", TypeName = "int(11)")]
-    public int PrintJobId { get; set; }
+    [Column("is_converted", TypeName = "tinyint(1)")]
+    [Comment("是否转换完成")]
+    public bool IsConverted { get; set; }
 
-    [ForeignKey("PrintJobId")]
-    public PrintJob PrintJob { get; set; }
+    #region 关联实体
+
+    [ForeignKey("UploaderId")]
+    public User Uploader { get; set; }
+
+    #endregion
 }

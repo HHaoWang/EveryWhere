@@ -2,10 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using EveryWhere.FileServer.Contexts.FileProvider;
-using EveryWhere.FileServer.Contexts.FileProvider.DTO;
-using EveryWhere.FileServer.Contexts.FileProvider.Exception;
 using HeyRed.Mime;
+using EveryWhere.FileServer.Utils;
 
 namespace EveryWhere.FileServer.Controllers;
 
@@ -14,12 +12,10 @@ namespace EveryWhere.FileServer.Controllers;
 public class FileController : ControllerBase
 {
     private readonly long _fileSizeLimit;
-    private readonly FileProviderService _fileProviderService;
 
-    public FileController(IConfiguration config,FileProviderService service)
+    public FileController(IConfiguration config)
     {
         _fileSizeLimit = config.GetValue<long>("FileSizeLimit");
-        _fileProviderService = service;
     }
 
     [Authorize]
@@ -38,17 +34,13 @@ public class FileController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetFile([Required] int orderId,[Required] int jobSequence, [Required] int printerId)
+    public IActionResult GetFile([Required] string fileName)
     {
         try
         {
-            FileInfo fileInfo = _fileProviderService.GetOrderJobFile(new FileRequirement(1, orderId, jobSequence));
+            FileInfo fileInfo = new FileInfo(Path.Combine(FileUtil.GetFileDirectory().FullName, fileName));
             var stream = System.IO.File.OpenRead(fileInfo.FullName);
             return File(stream, MimeTypesMap.GetMimeType(fileInfo.Name), fileInfo.Name);
-        }
-        catch (JobFileNotFoundException)
-        {
-            return NotFound();
         }
         catch (FileNotFoundException)
         {

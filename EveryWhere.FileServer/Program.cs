@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Microsoft.EntityFrameworkCore;
 using EveryWhere.Database;
-using EveryWhere.FileServer.Contexts.FileProvider;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -86,8 +85,6 @@ builder.Services.AddDbContext<Repository>(
 );
 
 //注入项目服务
-builder.Services.AddScoped<FileProviderService, FileProviderService>();
-builder.Services.AddScoped<FileProviderRepo, FileProviderRepo>();
 
 #endregion
 

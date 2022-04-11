@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace EveryWhere.Database.PO;
 
@@ -18,34 +19,39 @@ public class Order
     public DateTime CreateTime { get; set; }
 
     [Required]
-    [Column("status",TypeName = "ENUM('NotUploaded','UnPaid','Converting','Printing','NotTaken','Finish')")]
-    public StatusState Status { get; set; }
-
-    public List<File> Files { get; set; }
-
-    public List<PrintJob> PrintJobs { get; set; }
-
-    [Required]
     [Column("consumer_id",TypeName = "int(11)")]
     public int ConsumerId { get; set; }
-
-    [ForeignKey("ConsumerId")]
-    public Consumer Consumer { get; set; }
 
     [Required]
     [Column("shop_id", TypeName = "int(11)")]
     public int ShopId { get; set; }
 
+    [Required]
+    [Column("price",TypeName ="decimal(8,2)")]
+    [Comment("订单价格")]
+    public decimal Price { get; set; }
+
+    [Required]
+    [Column("state", TypeName = "enum('UnPaid','Printing','Finished')")]
+    [Comment("订单状态")]
+    public OrderState State { get; set; }
+
+    #region 关联实体
+
     [ForeignKey("ShopId")]
     public Shop Shop { get; set; }
 
-    public enum StatusState
+    [ForeignKey("ConsumerId")]
+    public User Consumer { get; set; }
+
+    public List<PrintJob> PrintJobs { get; set; }
+
+    #endregion
+
+    public enum OrderState
     {
-        NotUploaded,
         UnPaid,
-        Converting,
         Printing,
-        NotTaken,
-        Finish
+        Finished
     }
 }
