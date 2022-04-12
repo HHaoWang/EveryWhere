@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using EveryWhere.Database.JsonConverter;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace EveryWhere.Database.PO;
 
@@ -26,10 +23,12 @@ public class Shop
     [Required]
     [Column("open_time", TypeName = "time")]
     [Comment("开始营业时间")]
+    [JsonConverter(typeof(TimeOnlyJsonConverter))]
     public TimeOnly OpenTime { get; set; }
 
     [Required]
     [Column("close_time", TypeName = "time")]
+    [JsonConverter(typeof(TimeOnlyJsonConverter))]
     [Comment("结束营业时间")]
     public TimeOnly CloseTime { get; set; }
 
@@ -40,12 +39,16 @@ public class Shop
 
     [Required]
     [Column("area", TypeName = "varchar(10)")]
-    [Comment("店铺名称")]
+    [Comment("所在行政区域")]
     public string AreaCode { get; set; }
 
     [Column("location", TypeName = "varchar(20)")]
     [Comment("经纬度")]
     public string Location { get; set; }
+
+    [Column("tel", TypeName = "varchar(11)")]
+    [Comment("电话号")]
+    public string Tel { get; set; }
 
     [Required]
     [Column("create_time", TypeName = "datetime")]
@@ -56,12 +59,18 @@ public class Shop
     [Comment("店主ID")]
     public int ShopKeeperId { get; set; }
 
+    [Column("is_opening",TypeName = "tinyint(1)")]
+    [Comment("是否营业")]
+    public bool IsOpening { get; set; }
+
     #region 关联实体
 
     public List<Printer> Printers { get; set; }
 
     [ForeignKey("ShopKeeperId")]
     public User Shopkeeper { get; set; }
+    
+    public Area Area { get; set; }
 
     #endregion
 }

@@ -3,6 +3,7 @@ using System;
 using EveryWhere.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,48 +11,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EveryWhere.Database.Migrations
 {
     [DbContext(typeof(Repository))]
-    partial class RepositoryModelSnapshot : ModelSnapshot
+    [Migration("20220412092210_ModifyShopAndUser")]
+    partial class ModifyShopAndUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("EveryWhere.Database.PO.Area", b =>
-                {
-                    b.Property<int?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int(11)")
-                        .HasColumnName("id");
-
-                    b.Property<string>("AreaCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("area_code")
-                        .HasComment("行政区名称");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("name")
-                        .HasComment("行政区名称");
-
-                    b.Property<int?>("ParentAreaId")
-                        .HasColumnType("int(11)")
-                        .HasColumnName("parent_area_id")
-                        .HasComment("上级区划ID");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AreaCode")
-                        .IsUnique();
-
-                    b.HasIndex("ParentAreaId");
-
-                    b.ToTable("area");
-                });
 
             modelBuilder.Entity("EveryWhere.Database.PO.File", b =>
                 {
@@ -273,7 +241,7 @@ namespace EveryWhere.Database.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(10)")
                         .HasColumnName("area")
-                        .HasComment("所在行政区域");
+                        .HasComment("店铺名称");
 
                     b.Property<TimeOnly>("CloseTime")
                         .ValueGeneratedOnAdd()
@@ -316,14 +284,7 @@ namespace EveryWhere.Database.Migrations
                         .HasColumnName("shopkeeper_id")
                         .HasComment("店主ID");
 
-                    b.Property<string>("Tel")
-                        .HasColumnType("varchar(11)")
-                        .HasColumnName("tel")
-                        .HasComment("电话号");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("AreaCode");
 
                     b.HasIndex("ShopKeeperId");
 
@@ -388,15 +349,6 @@ namespace EveryWhere.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("user");
-                });
-
-            modelBuilder.Entity("EveryWhere.Database.PO.Area", b =>
-                {
-                    b.HasOne("EveryWhere.Database.PO.Area", "ParentArea")
-                        .WithMany("SubAreas")
-                        .HasForeignKey("ParentAreaId");
-
-                    b.Navigation("ParentArea");
                 });
 
             modelBuilder.Entity("EveryWhere.Database.PO.File", b =>
@@ -469,29 +421,13 @@ namespace EveryWhere.Database.Migrations
 
             modelBuilder.Entity("EveryWhere.Database.PO.Shop", b =>
                 {
-                    b.HasOne("EveryWhere.Database.PO.Area", "Area")
-                        .WithMany("Shops")
-                        .HasForeignKey("AreaCode")
-                        .HasPrincipalKey("AreaCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("EveryWhere.Database.PO.User", "Shopkeeper")
                         .WithMany()
                         .HasForeignKey("ShopKeeperId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Area");
-
                     b.Navigation("Shopkeeper");
-                });
-
-            modelBuilder.Entity("EveryWhere.Database.PO.Area", b =>
-                {
-                    b.Navigation("Shops");
-
-                    b.Navigation("SubAreas");
                 });
 
             modelBuilder.Entity("EveryWhere.Database.PO.Order", b =>

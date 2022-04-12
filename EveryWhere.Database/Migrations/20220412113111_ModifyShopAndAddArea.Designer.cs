@@ -3,6 +3,7 @@ using System;
 using EveryWhere.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EveryWhere.Database.Migrations
 {
     [DbContext(typeof(Repository))]
-    partial class RepositoryModelSnapshot : ModelSnapshot
+    [Migration("20220412113111_ModifyShopAndAddArea")]
+    partial class ModifyShopAndAddArea
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,17 +40,10 @@ namespace EveryWhere.Database.Migrations
                         .HasColumnName("name")
                         .HasComment("行政区名称");
 
-                    b.Property<int?>("ParentAreaId")
-                        .HasColumnType("int(11)")
-                        .HasColumnName("parent_area_id")
-                        .HasComment("上级区划ID");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AreaCode")
                         .IsUnique();
-
-                    b.HasIndex("ParentAreaId");
 
                     b.ToTable("area");
                 });
@@ -390,15 +385,6 @@ namespace EveryWhere.Database.Migrations
                     b.ToTable("user");
                 });
 
-            modelBuilder.Entity("EveryWhere.Database.PO.Area", b =>
-                {
-                    b.HasOne("EveryWhere.Database.PO.Area", "ParentArea")
-                        .WithMany("SubAreas")
-                        .HasForeignKey("ParentAreaId");
-
-                    b.Navigation("ParentArea");
-                });
-
             modelBuilder.Entity("EveryWhere.Database.PO.File", b =>
                 {
                     b.HasOne("EveryWhere.Database.PO.User", "Uploader")
@@ -490,8 +476,6 @@ namespace EveryWhere.Database.Migrations
             modelBuilder.Entity("EveryWhere.Database.PO.Area", b =>
                 {
                     b.Navigation("Shops");
-
-                    b.Navigation("SubAreas");
                 });
 
             modelBuilder.Entity("EveryWhere.Database.PO.Order", b =>

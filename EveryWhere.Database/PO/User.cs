@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace EveryWhere.Database.PO;
 
@@ -24,6 +25,10 @@ public class User
     public string NickName { get; set; }
 
     [Required]
+    [Column("avatar",TypeName = "varchar(120)")]
+    [Comment("头像")]
+    public string Avatar { get; set; }
+
     [Column("tel", TypeName = "varchar(11)")]
     [Comment("电话号")]
     public string Tel { get; set; }

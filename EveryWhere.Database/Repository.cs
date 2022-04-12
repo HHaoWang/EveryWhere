@@ -2,18 +2,17 @@
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using static System.Net.Mime.MediaTypeNames;
 
-#nullable disable
-
 namespace EveryWhere.Database;
 
 public class Repository : DbContext
 {
-    public virtual DbSet<PO.File> File { get; set; }
-    public virtual DbSet<PO.Order> Orders { get; set; }
-    public virtual DbSet<PO.User> Consumers { get; set; }
-    public virtual DbSet<PO.PrintJob> PrintJobs { get; set; }
-    public virtual DbSet<PO.Printer> Printers { get; set; }
-    public virtual DbSet<PO.Shop> Shops { get; set; }
+    public virtual DbSet<PO.File>? File { get; set; }
+    public virtual DbSet<PO.Order>? Orders { get; set; }
+    public virtual DbSet<PO.User>? Users { get; set; }
+    public virtual DbSet<PO.PrintJob>? PrintJobs { get; set; }
+    public virtual DbSet<PO.Printer>? Printers { get; set; }
+    public virtual DbSet<PO.Shop>? Shops { get; set; }
+    public virtual DbSet<PO.Area>? Areas { get; set; }
 
     public Repository() { }
 
@@ -79,5 +78,11 @@ public class Repository : DbContext
             entity.Property(e => e.CloseTime)
                 .HasDefaultValueSql("'00:00:00'");
         });
+
+        modelBuilder.Entity<PO.Shop>()
+            .HasOne(s => s.Area)
+            .WithMany(a => a.Shops)
+            .HasForeignKey(s => s.AreaCode)
+            .HasPrincipalKey(a => a.AreaCode);
     }
 }
