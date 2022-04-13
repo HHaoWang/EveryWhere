@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EveryWhere.Database.PO;
 
 [Table("file")]
-public class File
+public class File:BasePO
 {
     [Required]
     [Column("id",TypeName = "int(11)")]

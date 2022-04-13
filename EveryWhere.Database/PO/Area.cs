@@ -7,7 +7,7 @@ namespace EveryWhere.Database.PO;
 
 [Index(nameof(AreaCode),IsUnique = true)]
 [Table("area")]
-public class Area
+public class Area:BasePO
 {
     [Required]
     [Column("id", TypeName = "int(11)")]
@@ -30,7 +30,6 @@ public class Area
     #region 关联实体
 
     [ForeignKey("ParentAreaId")]
-    [JsonIgnore]
     public Area? ParentArea { get; set; }
 
     public List<Shop>? Shops { get; set; }

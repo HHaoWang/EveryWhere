@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Serilog;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -63,6 +64,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddControllers().AddNewtonsoftJson(option =>
 {
     option.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+    option.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 });
 
 //添加数据库服务

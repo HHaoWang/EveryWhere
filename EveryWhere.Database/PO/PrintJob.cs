@@ -13,7 +13,7 @@ namespace EveryWhere.Database.PO;
 #nullable disable
 
 [Table("print_job")]
-public class PrintJob
+public class PrintJob:BasePO
 {
     [Required]
     [Column("id", TypeName = "int(11)")]

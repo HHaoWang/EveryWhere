@@ -2,6 +2,7 @@
 using EveryWhere.MainServer.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EveryWhere.MainServer.Controllers;
 
@@ -26,6 +27,21 @@ public class ShopController : ControllerBase
         {
             statusCode = 200,
             shopList = _shopService.GetShopsByAreaCode(areaCode)
+        });
+    }
+
+    [HttpGet]
+    [Route("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        return new JsonResult(new
+        {
+            statusCode = 200,
+            shop = await _shopService.GetQuery(s=>s.Id==id)
+                .Include(s=>s.Printers)
+                .Include(s=>s.Area)
+                .Include(s=>s.Shopkeeper)
+                .FirstOrDefaultAsync()
         });
     }
 }

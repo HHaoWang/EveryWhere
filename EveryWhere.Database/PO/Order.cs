@@ -8,7 +8,7 @@ namespace EveryWhere.Database.PO;
 #nullable disable
 
 [Table("order")]
-public class Order
+public class Order:BasePO
 {
     [Required]
     [Column("id", TypeName = "int(11)")]

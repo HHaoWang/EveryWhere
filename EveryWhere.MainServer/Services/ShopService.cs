@@ -3,18 +3,14 @@ using EveryWhere.Database.PO;
 
 namespace EveryWhere.MainServer.Services;
 
-public class ShopService
+public class ShopService:BaseService<Shop>
 {
-    private readonly Repository _repository;
-
-    public ShopService(Repository repository)
+    public ShopService(Repository repository):base(repository)
     {
-        _repository = repository;
     }
 
     public List<Shop> GetShopsByAreaCode(string areaCode)
     {
-        return _repository.Shops
-            !.Where(s => s.AreaCode.Equals(areaCode)).ToList();
+        return GetAll(s => s.AreaCode.Equals(areaCode));
     }
 }

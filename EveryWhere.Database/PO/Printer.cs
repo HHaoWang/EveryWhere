@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 namespace EveryWhere.Database.PO;
 
 [Table("printer")]
-public class Printer
+public class Printer:BasePO
 {
     [Required]
     [Column("id", TypeName = "int(11)")]
