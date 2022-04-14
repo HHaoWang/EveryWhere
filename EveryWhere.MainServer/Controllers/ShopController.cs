@@ -31,7 +31,7 @@ public class ShopController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{id}")]
+    [Route("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
         return new JsonResult(new

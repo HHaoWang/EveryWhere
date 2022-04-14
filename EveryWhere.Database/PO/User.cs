@@ -38,7 +38,6 @@ public class User:BasePO
     [Comment("微信下发的openId")]
     public string WechatOpenId { get; set; }
 
-    [Required]
     [Column("wechat_union_id",TypeName = "varchar(120)")]
     [Comment("微信下发的unionId")]
     public string WechatUnionId { get; set; }

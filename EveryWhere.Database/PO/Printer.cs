@@ -53,10 +53,10 @@ public class Printer:BasePO
     public string SupportSizesJson { get; set; }
 
     [NotMapped]
-    public List<string> SupportSizes
+    public Dictionary<string,PaperSizePrice> SupportSizes
     {
-        get => JsonConvert.DeserializeObject<List<string>>(SupportSizesJson);
-        set => JsonConvert.SerializeObject(value);
+        get => JsonConvert.DeserializeObject<Dictionary<string, PaperSizePrice>>(SupportSizesJson);
+        set => SupportSizesJson = JsonConvert.SerializeObject(value);
     }
 
     [Required]
@@ -71,4 +71,12 @@ public class Printer:BasePO
     public List<PrintJob> PrintJobs { get; set; }
 
     #endregion
+
+    public struct PaperSizePrice
+    {
+        public decimal SingleBlack;
+        public decimal SingleColor;
+        public decimal DuplexBlack;
+        public decimal DuplexColor;
+    }
 }

@@ -29,9 +29,9 @@ public class File:BasePO
     public int UploaderId { get; set; }
 
     [Required]
-    [Column("size", TypeName = "float(8,2)")]
+    [Column("size", TypeName = "double(8,2)")]
     [Comment("文件大小")]
-    public float Size { get; set; }
+    public double Size { get; set; }
 
     [Required]
     [Column("original_name", TypeName = "varchar(120)")]

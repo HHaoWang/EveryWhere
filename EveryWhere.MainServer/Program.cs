@@ -2,6 +2,8 @@ using System.Configuration;
 using System.Text;
 using EveryWhere.Database;
 using EveryWhere.DTO.Settings;
+using EveryWhere.MainServer.Entity.Setting;
+using EveryWhere.MainServer.MessageQueue;
 using EveryWhere.MainServer.Services;
 using EveryWhere.MainServer.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -29,6 +31,8 @@ builder.Host.UseSerilog((context, logger) =>
 
 //添加token配置服务
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("tokenConfig"));
+//添加消息队列服务配置
+builder.Services.Configure<MessageQueueSettings>(builder.Configuration.GetSection("MessageQueue"));
 //实例化token配置
 var sec = builder.Configuration.GetSection("tokenConfig");
 var tokenSettings = ConfigurationBinder.Get<TokenSettings>(sec);
@@ -89,6 +93,8 @@ builder.Services.AddDbContext<Repository>(
 builder.Services.AddScoped<UserService,UserService>();
 builder.Services.AddScoped<ShopService,ShopService>();
 builder.Services.AddScoped<AreaService, AreaService>();
+builder.Services.AddScoped<FileService, FileService>();
+builder.Services.AddScoped<Publisher, Publisher>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

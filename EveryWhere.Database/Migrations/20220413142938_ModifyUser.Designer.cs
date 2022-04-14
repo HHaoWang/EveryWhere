@@ -3,6 +3,7 @@ using System;
 using EveryWhere.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,13 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EveryWhere.Database.Migrations
 {
     [DbContext(typeof(Repository))]
-    partial class RepositoryModelSnapshot : ModelSnapshot
+    [Migration("20220413142938_ModifyUser")]
+    partial class ModifyUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.4")
+                .HasAnnotation("ProductVersion", "6.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("EveryWhere.Database.PO.Area", b =>
@@ -97,8 +99,8 @@ namespace EveryWhere.Database.Migrations
                         .HasColumnName("page_count")
                         .HasComment("页数");
 
-                    b.Property<double>("Size")
-                        .HasColumnType("double(8,2)")
+                    b.Property<float>("Size")
+                        .HasColumnType("float(8,2)")
                         .HasColumnName("size")
                         .HasComment("文件大小");
 

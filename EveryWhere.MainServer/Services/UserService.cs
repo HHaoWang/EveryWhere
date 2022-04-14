@@ -17,19 +17,17 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace EveryWhere.MainServer.Services;
 
-public class UserService
+public class UserService:BaseService<User>
 {
     private readonly IConfiguration _configuration;
     private readonly IHttpClientFactory _clientFactory;
-    private readonly Repository _repository;
     private readonly TokenSettings _tokenSettings;
 
     public UserService(IConfiguration configuration,
-        IHttpClientFactory clientFactory, Repository repository, IOptions<TokenSettings> tokenSettings)
+        IHttpClientFactory clientFactory, Repository repository, IOptions<TokenSettings> tokenSettings) : base(repository)
     {
         _configuration = configuration;
         _clientFactory = clientFactory;
-        _repository = repository;
         _tokenSettings = tokenSettings.Value;
     }
 
@@ -72,9 +70,10 @@ public class UserService
         user.Avatar = fileName;
         user.NickName = request.NickName;
         user.CreateTime = DateTime.Now;
+        user.WechatUnionId = userInfo.UnionId;
 
-        _repository.Add(user);
-        await _repository.SaveChangesAsync();
+        Repository.Add(user);
+        await Repository.SaveChangesAsync();
     }
 
     public async Task<string> GetAuthenticatedTokenAsync(LoginRequest request)
@@ -99,7 +98,7 @@ public class UserService
         #endregion
 
         #region 查找用户
-        User? user = await _repository.Users
+        User? user = await Repository.Users
             !.FirstOrDefaultAsync(user => userInfo.OpenId!.Equals(user.WechatOpenId));
         #endregion
 
@@ -116,14 +115,15 @@ public class UserService
         if (!user.WechatSessionKey.Equals(userInfo.SessionKey))
         {
             user.WechatSessionKey = userInfo.SessionKey;
-            await _repository.SaveChangesAsync();
+            await Repository.SaveChangesAsync();
         }
         #endregion
 
         #region 签发token
         Claim[] claims = {
                 new(ClaimTypes.Name,user.Id.ToString()),
-                new("userId",user.Id.ToString())
+                new("UserId",user.Id.ToString()),
+                new(ClaimTypes.Role,"Consumer")
             };
         //生成盐值凭据
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(_tokenSettings.SaltValue));
