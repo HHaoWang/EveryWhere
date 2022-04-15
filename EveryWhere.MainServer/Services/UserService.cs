@@ -5,6 +5,7 @@ using System.Text;
 using EveryWhere.Database;
 using EveryWhere.Database.PO;
 using EveryWhere.DTO.Settings;
+using EveryWhere.MainServer.Entity.Dto;
 using EveryWhere.MainServer.Entity.Exception;
 using EveryWhere.MainServer.Entity.Request;
 using EveryWhere.MainServer.Entity.Response;
@@ -132,6 +133,46 @@ public class UserService:BaseService<User>
         string? token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
         #endregion
 
+        return token;
+    }
+
+    public async Task<string> GetTokenByQrCodeAsync(QrCodeCacheInfo qrInfo)
+    {
+        if (qrInfo.UserId == null)
+        {
+            return "";
+        }
+
+        User? user = await GetByIdAsync(qrInfo.UserId!.Value);
+
+        if (user is null)
+        {
+            return "";
+        }
+
+        List<Claim> claims = new(){
+            new Claim(ClaimTypes.Name,user.Id.ToString()),
+            new Claim("UserId",user.Id.ToString()),
+            new Claim(ClaimTypes.Role,"Consumer"),
+            new Claim(ClaimTypes.Role,"Shopkeeper")
+        };
+        if (user.IsManager)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, "Manager"));
+        }
+        //生成盐值凭据
+        SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(_tokenSettings.SaltValue));
+        //生成签名证书
+        SigningCredentials credential = new(securityKey, SecurityAlgorithms.HmacSha256);
+        //生成token
+        JwtSecurityToken jwtToken = new(
+            issuer: _tokenSettings.Issuer,
+            audience: _tokenSettings.Audience,
+            claims: claims,
+            notBefore: null,
+            expires: DateTime.Now.AddHours(_tokenSettings.AccessExpiration),
+            signingCredentials: credential);
+        string? token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
         return token;
     }
 }
