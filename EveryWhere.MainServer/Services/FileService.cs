@@ -10,10 +10,12 @@ namespace EveryWhere.MainServer.Services;
 public class FileService:BaseService<File>
 {
     private readonly Publisher _publisher;
+    private readonly IConfiguration _configuration;
 
-    public FileService(Repository repository, Publisher publisher) : base(repository)
+    public FileService(Repository repository, Publisher publisher, IConfiguration configuration) : base(repository)
     {
         this._publisher = publisher;
+        _configuration = configuration;
     }
 
     public async Task<File> UploadFile(Stream file, string originalName, int uploaderId)
@@ -27,9 +29,9 @@ public class FileService:BaseService<File>
         File fileRecord = new()
         {
             IsConverted = false,
-            Location = fullFileName,
+            Location = _configuration["serverHost"] + "/api/File/Uploaded/" + fileName,
             Name = fileName,
-            Size = Math.Round(ByteSize.FromBytes(file.Length).MebiBytes,2),
+            Size = Math.Round(ByteSize.FromBytes(file.Length).MebiBytes, 2),
             UploaderId = uploaderId,
             OriginalName = originalName
         };

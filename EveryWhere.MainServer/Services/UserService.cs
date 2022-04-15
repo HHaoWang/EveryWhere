@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Mime;
+﻿using System.IdentityModel.Tokens.Jwt;
 using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
@@ -50,19 +48,13 @@ public class UserService:BaseService<User>
         HttpResponseMessage httpResponse = await client.GetAsync(request.AvatarUrl);
         httpResponse.EnsureSuccessStatusCode();
 
-        byte[] pic = await httpResponse.Content.ReadAsByteArrayAsync();
+        Stream file = await httpResponse.Content.ReadAsStreamAsync();
         
         string fileName = Path.GetRandomFileName() + ".jpg";
-        await using (MemoryStream memoryStream = new(pic))
-        {
-            #pragma warning disable CA1416 // 验证平台兼容性
-
-            Image image = Image.FromStream(memoryStream);
-            DirectoryInfo avatarDirectory = FileUtil.GetAvatarDirectory();
-            image.Save(Path.Combine(avatarDirectory.FullName, fileName));
-
-            #pragma warning restore CA1416 // 验证平台兼容性
-        }
+        DirectoryInfo avatarDirectory = FileUtil.GetAvatarDirectory();
+        await using FileStream stream = new(Path.Combine(avatarDirectory.FullName, fileName), FileMode.Create);
+        await file.CopyToAsync(stream);
+        await file.DisposeAsync();
 
         //用户数据持久化
         user.WechatOpenId = userInfo.OpenId;

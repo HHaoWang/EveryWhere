@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <COMReference Include="Microsoft.Office.Interop.Word">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>7</VersionMinor>
+      <VersionMajor>8</VersionMajor>
+      <Guid>00020905-0000-0000-c000-000000000046</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
 	  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
@@ -14,6 +26,7 @@
 	  <PackageReference Include="MimeTypesMap" Version="1.0.8" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	  <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
+	  <PackageReference Include="RabbitMQ.Client" Version="6.2.4" />
 	  <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
 	  <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
 	  <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
@@ -24,6 +37,10 @@
   <ItemGroup>
     <ProjectReference Include="..\EveryWhere.Database\EveryWhere.Database.csproj" />
     <ProjectReference Include="..\EveryWhere.DTO\EveryWhere.DTO.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Entity\Setting\" />
   </ItemGroup>
 
 </Project>

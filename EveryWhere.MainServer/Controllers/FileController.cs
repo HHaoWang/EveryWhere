@@ -15,10 +15,12 @@ public class FileController : ControllerBase
 {
     private readonly long _fileSizeLimit;
     private readonly FileService _fileService;
+    private readonly ILogger<FileController> _logger;
 
-    public FileController(IConfiguration config, FileService fileService)
+    public FileController(IConfiguration config, FileService fileService, ILogger<FileController> logger)
     {
         _fileService = fileService;
+        _logger = logger;
         _fileSizeLimit = config.GetValue<long>("FileSizeLimit");
     }
 
@@ -43,6 +45,7 @@ public class FileController : ControllerBase
     public IActionResult GetUploadedFile(string name)
     {
         FileInfo fileInfo = new(Path.Combine(FileUtil.GetUploadedFileDirectory().FullName, name));
+        _logger.LogInformation(fileInfo.FullName);
         try
         {
             FileStream stream = System.IO.File.OpenRead(fileInfo.FullName);
@@ -90,6 +93,17 @@ public class FileController : ControllerBase
         {
             statusCode = 200,
             data = fileRecord
+        });
+    }
+
+    [HttpGet]
+    [Route("Info/{id:int}")]
+    public async Task<IActionResult> GetFileInfo([Required]int id)
+    {
+        return new JsonResult(new
+        {
+            statusCode = 200,
+            data = await _fileService.GetByIdAsync(id)
         });
     }
 }

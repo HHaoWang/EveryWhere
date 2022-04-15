@@ -31,11 +31,11 @@ builder.Host.UseSerilog((context, logger) =>
 
 //添加token配置服务
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("tokenConfig"));
-//添加消息队列服务配置
-builder.Services.Configure<MessageQueueSettings>(builder.Configuration.GetSection("MessageQueue"));
 //实例化token配置
 var sec = builder.Configuration.GetSection("tokenConfig");
 var tokenSettings = ConfigurationBinder.Get<TokenSettings>(sec);
+//添加消息队列服务配置
+builder.Services.Configure<MessageQueueSettings>(builder.Configuration.GetSection("MessageQueue"));
 
 //添加jwt验证
 builder.Services.AddAuthentication(option =>
@@ -89,6 +89,9 @@ builder.Services.AddDbContext<Repository>(
         })
 );
 
+//添加缓存服务
+builder.Services.AddMemoryCache();
+
 // Add services to the container.
 builder.Services.AddScoped<UserService,UserService>();
 builder.Services.AddScoped<ShopService,ShopService>();
@@ -120,7 +123,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseRouting();
 

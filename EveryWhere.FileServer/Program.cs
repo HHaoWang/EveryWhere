@@ -6,7 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Microsoft.EntityFrameworkCore;
 using EveryWhere.Database;
+using EveryWhere.FileServer.Entity.Setting;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using EveryWhere.FileServer.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,8 @@ builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("toke
 //实例化token配置
 var sec = builder.Configuration.GetSection("tokenConfig");
 var tokenSettings = ConfigurationBinder.Get<TokenSettings>(sec);
+//添加消息队列服务配置
+builder.Services.Configure<MessageQueueSettings>(builder.Configuration.GetSection("MessageQueue"));
 
 //添加jwt验证
 builder.Services.AddAuthentication(option =>
@@ -70,7 +74,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<Repository>(
     dbContextOptions => dbContextOptions
         .UseMySql(
-            builder.Configuration.GetConnectionString("FileServerContext"),
+            builder.Configuration.GetConnectionString("EveryWhereContext"),
             new MySqlServerVersion(new Version(5, 7))
         )
         .EnableDetailedErrors()
@@ -86,6 +90,8 @@ builder.Services.AddDbContext<Repository>(
 
 //注入项目服务
 
+builder.Services.AddHostedService<ConvertFileService>();
+
 #endregion
 
 var app = builder.Build();
@@ -100,7 +106,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 

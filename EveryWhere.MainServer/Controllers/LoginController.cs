@@ -6,47 +6,48 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace EveryWhere.MainServer.Controllers
+namespace EveryWhere.MainServer.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class LoginController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class LoginController : ControllerBase
+    private IConfiguration _configuration;
+    private readonly UserService _userService;
+
+    public LoginController(IConfiguration configuration, UserService userService)
     {
-        private IConfiguration _configuration;
-        private readonly UserService _userService;
+        _configuration = configuration;
+        _userService = userService;
+    }
 
-        public LoginController(IConfiguration configuration, UserService userService)
+    [HttpPost]
+    public async Task<ActionResult> LoginAsync(LoginRequest request)
+    {
+        try
         {
-            _configuration = configuration;
-            _userService = userService;
+            string token = await _userService.GetAuthenticatedTokenAsync(request);
+            return new JsonResult(new { statusCode = 200, data = new { token } });
         }
-
-        [HttpPost]
-        public async Task<ActionResult> LoginAsync(LoginRequest request)
+        catch (RequestWechatOpenIdException exception)
         {
-            try
-            {
-                string token = await _userService.GetAuthenticatedTokenAsync(request);
-                return new JsonResult(new { statusCode = 200, data = new { token } });
-            }
-            catch (RequestWechatOpenIdException exception)
-            {
-                return StatusCode(500, new JsonResult(new { statusCode = 500, errorMsg = exception.Message }));
-            }
-            catch (NoNecessaryParameterException exception)
-            {
-                ModelStateDictionary d = new();
-                d.AddModelError(exception.RequiredParameter, "required");
-                return ValidationProblem(new ValidationProblemDetails(d));
-            }
+            return StatusCode(500, new JsonResult(new { statusCode = 500, errorMsg = exception.Message }));
         }
-
-        [Route("Valid")]
-        [HttpGet]
-        [Authorize(Roles = "Consumer")]
-        public IActionResult HasLogin()
+        catch (NoNecessaryParameterException exception)
         {
-            return new JsonResult(new { statusCode = 200, data = new { key = "value" } });
+            ModelStateDictionary d = new();
+            d.AddModelError(exception.RequiredParameter, "required");
+            return ValidationProblem(new ValidationProblemDetails(d));
         }
     }
+
+    [Route("Valid")]
+    [HttpGet]
+    [Authorize(Roles = "Consumer")]
+    public IActionResult HasLogin()
+    {
+        return new JsonResult(new { statusCode = 200, data = new { key = "value" } });
+    }
+
+
 }
