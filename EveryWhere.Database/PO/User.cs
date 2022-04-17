@@ -10,8 +10,6 @@ using Newtonsoft.Json;
 
 namespace EveryWhere.Database.PO;
 
-#nullable disable
-
 [Table("user")]
 public class User:BasePO
 {
@@ -22,43 +20,43 @@ public class User:BasePO
     [Required]
     [Column("nick_name",TypeName = "varchar(120)")]
     [Comment("昵称")]
-    public string NickName { get; set; }
+    public string? NickName { get; set; }
 
     [Required]
     [Column("avatar",TypeName = "varchar(120)")]
     [Comment("头像")]
-    public string Avatar { get; set; }
+    public string? Avatar { get; set; }
 
     [Column("tel", TypeName = "varchar(11)")]
     [Comment("电话号")]
-    public string Tel { get; set; }
+    public string? Tel { get; set; }
 
     [Required]
     [Column("wechat_open_id",TypeName = "varchar(120)")]
     [Comment("微信下发的openId")]
-    public string WechatOpenId { get; set; }
+    public string? WechatOpenId { get; set; }
 
     [Column("wechat_union_id",TypeName = "varchar(120)")]
     [Comment("微信下发的unionId")]
-    public string WechatUnionId { get; set; }
+    public string? WechatUnionId { get; set; }
 
     [Required]
     [Column("wechat_session_key", TypeName = "varchar(120)")]
     [Comment("微信下发的sessionKey")]
-    public string WechatSessionKey { get; set; }
+    public string? WechatSessionKey { get; set; }
 
     [Required]
     [Column("is_manager", TypeName = "tinyint(1)")]
     [Comment("是否是管理者")]
-    public bool IsManager { get; set; }
+    public bool? IsManager { get; set; }
 
     [Required]
     [Column("create_time", TypeName = "datetime")]
-    public DateTime CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; }
 
     #region 关联实体
 
-    public List<Order> Orders { get; set; }
+    public List<Order>? Orders { get; set; }
 
     #endregion
 }

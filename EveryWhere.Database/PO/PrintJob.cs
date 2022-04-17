@@ -10,8 +10,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EveryWhere.Database.PO;
 
-#nullable disable
-
 [Table("print_job")]
 public class PrintJob:BasePO
 {
@@ -22,37 +20,37 @@ public class PrintJob:BasePO
     [Required]
     [Column("is_finished", TypeName = "tinyint(1)")]
     [Comment("是否完成")]
-    public bool IsFinished { get; set; }
+    public bool? IsFinished { get; set; }
 
     [Required]
     [Column("file_id", TypeName = "int(11)")]
     [Comment("文件ID")]
-    public int FileId { get; set; }
+    public int? FileId { get; set; }
 
     [Required]
     [Column("order_id", TypeName = "int(11)")]
     [Comment("订单ID")]
-    public int OrderId { get; set; }
+    public int? OrderId { get; set; }
 
     [Required]
     [Column("printer_id", TypeName = "int(11)")]
     [Comment("打印机ID")]
-    public int PrinterId { get; set; }
+    public int? PrinterId { get; set; }
 
     [Required]
     [Column("create_time", TypeName = "datetime")]
-    public DateTime CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; }
 
     #region 关联实体
 
     [ForeignKey("OrderId")]
-    public Order Order { get; set; }
+    public Order? Order { get; set; }
 
     [ForeignKey("FileId")]
-    public File File { get; set; }
+    public File? File { get; set; }
 
     [ForeignKey("PrinterId")]
-    public Printer Printer { get; set; }
+    public Printer? Printer { get; set; }
 
     #endregion
 }

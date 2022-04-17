@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EveryWhere.Database.PO;
 
-#nullable disable
-
 [Table("order")]
 public class Order:BasePO
 {
@@ -16,35 +14,35 @@ public class Order:BasePO
 
     [Required]
     [Column("create_time", TypeName = "datetime")]
-    public DateTime CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; }
 
     [Required]
     [Column("consumer_id",TypeName = "int(11)")]
-    public int ConsumerId { get; set; }
+    public int? ConsumerId { get; set; }
 
     [Required]
     [Column("shop_id", TypeName = "int(11)")]
-    public int ShopId { get; set; }
+    public int? ShopId { get; set; }
 
     [Required]
     [Column("price",TypeName ="decimal(8,2)")]
     [Comment("订单价格")]
-    public decimal Price { get; set; }
+    public decimal? Price { get; set; }
 
     [Required]
     [Column("state", TypeName = "enum('UnPaid','Printing','Finished')")]
     [Comment("订单状态")]
-    public OrderState State { get; set; }
+    public OrderState? State { get; set; }
 
     #region 关联实体
 
     [ForeignKey("ShopId")]
-    public Shop Shop { get; set; }
+    public Shop? Shop { get; set; }
 
     [ForeignKey("ConsumerId")]
-    public User Consumer { get; set; }
+    public User? Consumer { get; set; }
 
-    public List<PrintJob> PrintJobs { get; set; }
+    public List<PrintJob>? PrintJobs { get; set; }
 
     #endregion
 

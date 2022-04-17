@@ -156,7 +156,7 @@ public class UserService:BaseService<User>
             new Claim(ClaimTypes.Role,"Consumer"),
             new Claim(ClaimTypes.Role,"Shopkeeper")
         };
-        if (user.IsManager)
+        if (user.IsManager==true)
         {
             claims.Add(new Claim(ClaimTypes.Role, "Manager"));
         }

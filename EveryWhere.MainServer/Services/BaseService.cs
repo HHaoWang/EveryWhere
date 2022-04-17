@@ -3,6 +3,7 @@ using EveryWhere.Database.PO;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace EveryWhere.MainServer.Services;
 
@@ -43,15 +44,23 @@ public class BaseService<T> where T:BasePO
 
     public virtual async Task<int> UpdateAsync(T updatedEntity)
     {
-        Repository.Set<T>().Attach(updatedEntity);
-        var entry = Repository.Entry(updatedEntity);
-        foreach (PropertyInfo propertyInfo in updatedEntity.GetType().GetProperties())
+        List<PropertyInfo> propertyInfos = new(updatedEntity.GetType().GetProperties());
+        int id = (int)updatedEntity.GetType().GetProperty("Id")?.GetValue(updatedEntity)!;
+        T? existPo = await GetByIdAsync(id);
+        if (existPo == null)
         {
-            if (propertyInfo.GetValue(updatedEntity) != null)
-            {
-                entry.Property(t => propertyInfo).IsModified = true;
-            }
+            return 0;
         }
+
+        var y = propertyInfos
+            .Where(propertyInfo => propertyInfo.GetValue(updatedEntity) != null);
+        foreach (PropertyInfo propertyInfo in propertyInfos
+                     .Where(propertyInfo => propertyInfo.GetValue(updatedEntity) != null))
+        {
+            existPo.GetType().GetProperty(propertyInfo.Name)!.SetValue(existPo,propertyInfo.GetValue(updatedEntity));
+        }
+
+        updatedEntity = existPo;
 
         return await Repository.SaveChangesAsync();
     }

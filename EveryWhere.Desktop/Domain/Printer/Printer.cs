@@ -3,36 +3,57 @@ using System.Runtime.InteropServices;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Printing;
 
 namespace EveryWhere.Desktop.Domain.Printer;
 
 public class Printer
 {
-    public readonly PrinterInfo PrinterInfo;
-    public string PrinterName => PrinterInfo.PrinterName;
-    public bool IsOffline => PrinterInfo.isOffLine;
+    private readonly PrinterInfo _printerInfo;
+    private readonly PrintQueue _queue;
+    private readonly PrintCapabilities _capabilities;
 
-    public Printer(PrinterInfo printerInfo)
+    public string PrinterName => _printerInfo.PrinterName;
+    public bool IsOffline => _printerInfo.isOffLine;
+    public bool SupportColor => _capabilities.OutputColorCapability.Contains(OutputColor.Color);
+    public bool SupportDuplex => _capabilities
+        .DuplexingCapability
+        .Aggregate(false, (supportDuplex, duplex) 
+            => duplex == Duplexing.TwoSidedLongEdge || duplex == Duplexing.TwoSidedShortEdge,
+            computedValue=>computedValue);
+
+    public List<PageMediaSizeName> SupportSizeNames =>
+        _capabilities.PageMediaSizeCapability
+            .Select(s => s.PageMediaSizeName)
+            .Where(s=>s!=null)
+            .Select(s=>(PageMediaSizeName)s!)
+            .ToList();
+
+    private Printer(PrinterInfo printerInfo)
     {
-        PrinterInfo = printerInfo;
+        _printerInfo = printerInfo;
+        _queue = new LocalPrintServer().GetPrintQueue(PrinterName);
+        _capabilities = _queue.GetPrintCapabilities();
     }
 
     public static List<Printer> GetLocalPrinters()
     {
         List<Printer> localPrinters = new();
-        PrinterInfo[] printerInfos;
         uint cbNeeded = 0;
         uint cReturned = 0;
         //获取一个打印机信息的内存大小
-        bool ret = EnumPrinters(PrinterEnumFlags.PRINTER_ENUM_LOCAL, null, 2, IntPtr.Zero, 0, ref cbNeeded, ref cReturned);
-        IntPtr pAddr = Marshal.AllocHGlobal((int)cbNeeded);
+        // ReSharper disable once JoinDeclarationAndInitializer
+        bool ret;
+        EnumPrinters(PrinterEnumFlags.PRINTER_ENUM_LOCAL, null!, 2, IntPtr.Zero, 0, ref cbNeeded, ref cReturned);
+        IntPtr pAddress = Marshal.AllocHGlobal((int)cbNeeded);
 
         //获取全部打印机信息
-        ret = EnumPrinters(PrinterEnumFlags.PRINTER_ENUM_LOCAL, null, 2, pAddr, cbNeeded, ref cbNeeded, ref cReturned);
+        ret = EnumPrinters(PrinterEnumFlags.PRINTER_ENUM_LOCAL, null!, 2, pAddress, cbNeeded, ref cbNeeded, ref cReturned);
         if (!ret) return localPrinters;
 
-        printerInfos = new PrinterInfo[cReturned];
-        long offset = pAddr.ToInt64();
+        PrinterInfo[] printerInfos = new PrinterInfo[cReturned];
+        long offset = pAddress.ToInt64();
         for (int i = 0; i < cReturned; i++)
         {
             PrinterInfo2 t = Marshal.PtrToStructure<PrinterInfo2>(new IntPtr(offset))!;
@@ -41,7 +62,7 @@ public class Printer
             printerInfos[i].devMode = Marshal.PtrToStructure<DevMode>(printerInfos[i].pDevMode);
             localPrinters.Add(new Printer(printerInfos[i]));
         }
-        Marshal.FreeHGlobal(pAddr);
+        Marshal.FreeHGlobal(pAddress);
         return localPrinters;
     }
 
@@ -62,5 +83,11 @@ public class Printer
         ref uint pcbNeeded,
         ref uint pcReturned
     );
+    #endregion
+
+    #region 内部类型
+
+    
+
     #endregion
 }

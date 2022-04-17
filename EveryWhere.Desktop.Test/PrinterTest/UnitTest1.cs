@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Printing;
 using EveryWhere.Desktop.Domain.Printer;
 using NUnit.Framework;
 
@@ -16,6 +18,6 @@ public class Tests
     public void Test1()
     {
         List<Printer> printers = Printer.GetLocalPrinters();
-        Assert.IsTrue(printers.Exists(p=>p.PrinterName.Equals("Canon MG2400 series Printer",StringComparison.CurrentCultureIgnoreCase) && p.IsOffline));
+        Assert.IsFalse(printers.Exists(p=>p.PrinterName.Equals("Canon MG2400 series Printer",StringComparison.CurrentCultureIgnoreCase) && p.IsOffline));
     }
 }

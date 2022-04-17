@@ -65,7 +65,7 @@ public class LoginController : ControllerBase
             CreateTime = now,
             Uuid = uuid,
             State = QrCodeCacheInfo.QrCodeState.Valid,
-            ExpireTime = now.AddSeconds(15)
+            ExpireTime = now.AddSeconds(20)
         }, TimeSpan.FromSeconds(60));
         return new JsonResult(new
         {
@@ -86,7 +86,8 @@ public class LoginController : ControllerBase
             return new JsonResult(new
             {
                 statusCode = 404,
-                message = "令牌不存在！"
+                message = "获取令牌失败！",
+                qrInfo
             });
         }
 
@@ -99,12 +100,13 @@ public class LoginController : ControllerBase
             });
         }
 
-        if (qrInfo.ExpireTime > DateTime.Now || qrInfo.State == QrCodeCacheInfo.QrCodeState.Invalid)
+        if (qrInfo.ExpireTime < DateTime.Now || qrInfo.State == QrCodeCacheInfo.QrCodeState.Invalid)
         {
             return new JsonResult(new
             {
                 statusCode = 400,
-                message = "二维码已过期！"
+                message = "二维码已过期！",
+                qrInfo
             });
         }
 
@@ -149,7 +151,7 @@ public class LoginController : ControllerBase
     [Authorize(Roles = "Consumer")]
     public IActionResult QrCodeLogin(string uuid)
     {
-        int uploaderId = Convert.ToInt32(HttpContext.User.FindFirst(c => c.Type.Equals("UserId", StringComparison.CurrentCultureIgnoreCase))?.Value);
+        int userId = Convert.ToInt32(HttpContext.User.FindFirst(c => c.Type.Equals("UserId", StringComparison.CurrentCultureIgnoreCase))?.Value);
 
         if (!_memoryCache.TryGetValue(uuid, out QrCodeCacheInfo qrInfo))
         {
@@ -160,10 +162,16 @@ public class LoginController : ControllerBase
             });
         }
 
-        qrInfo.UserId = uploaderId;
-        qrInfo.State = QrCodeCacheInfo.QrCodeState.HasLogin;
+        QrCodeCacheInfo newInfo = new()
+        {
+            CreateTime = qrInfo.CreateTime,
+            ExpireTime = qrInfo.ExpireTime,
+            State = QrCodeCacheInfo.QrCodeState.HasLogin,
+            UserId = userId,
+            Uuid = uuid
+        };
 
-        _memoryCache.Set(uuid, qrInfo, TimeSpan.FromTicks(20));
+        _memoryCache.Set(uuid, newInfo, TimeSpan.FromSeconds(30));
 
         return new JsonResult(new { statusCode = 200, messsage="登录成功！" });
     }
