@@ -1,6 +1,7 @@
 ﻿using EveryWhere.Database.JsonConverter;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+#pragma warning disable CS8618
 
 namespace EveryWhere.MainServer.Entity.Request;
 
@@ -23,7 +24,7 @@ public class PostShopRequest
     [Required]
     public string AreaCode { get; set; }
 
-    public string Location { get; set; }
+    public string? Location { get; set; }
 
     [Required]
     public string Tel { get; set; }

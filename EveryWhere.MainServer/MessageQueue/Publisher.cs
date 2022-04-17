@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Connections;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Text;
 using EveryWhere.MainServer.Entity.Setting;
@@ -11,7 +10,7 @@ namespace EveryWhere.MainServer.MessageQueue;
 public class Publisher
 {
     private readonly ILogger _logger;
-    private readonly IModel _channel;
+    private readonly IModel? _channel;
 
     public Publisher(IOptions<MessageQueueSettings> settings, ILogger<Publisher> logger)
     {
@@ -35,17 +34,21 @@ public class Publisher
         }
     }
 
-    public virtual void PushMessage(string routingKey, object message)
+    private void PushMessage(string routingKey, object message)
     {
         _logger.LogInformation($"Push Message, routingKey:{routingKey}");
-
+        if (_channel == null)
+        {
+            _logger.LogError("队列未初始化！");
+            return;
+        }
         //事先声明队列防止不存在导致数据丢失
         _channel.QueueDeclare(routingKey, false, false, false, null);
         _channel.ExchangeDeclare("exchange", ExchangeType.Direct);
         _channel.QueueBind(routingKey, "exchange", routingKey);
 
         string msgJson = JsonConvert.SerializeObject(message);
-        var body = Encoding.UTF8.GetBytes(msgJson);
+        byte[] body = Encoding.UTF8.GetBytes(msgJson);
         _channel.BasicPublish("exchange", routingKey, null, body);
     }
 

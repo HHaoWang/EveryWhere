@@ -1,6 +1,6 @@
-using System.Configuration;
 using System.Text;
 using EveryWhere.Database;
+using EveryWhere.Database.JsonConverter;
 using EveryWhere.DTO.Settings;
 using EveryWhere.MainServer.Entity.Setting;
 using EveryWhere.MainServer.MessageQueue;
@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -32,8 +32,8 @@ builder.Host.UseSerilog((context, logger) =>
 //添加token配置服务
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("tokenConfig"));
 //实例化token配置
-var sec = builder.Configuration.GetSection("tokenConfig");
-var tokenSettings = ConfigurationBinder.Get<TokenSettings>(sec);
+IConfigurationSection? sec = builder.Configuration.GetSection("tokenConfig");
+TokenSettings? tokenSettings = sec.Get<TokenSettings>();
 //添加消息队列服务配置
 builder.Services.Configure<MessageQueueSettings>(builder.Configuration.GetSection("MessageQueue"));
 
@@ -69,6 +69,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(option =>
 {
     option.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
     option.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    option.SerializerSettings.Converters.Add(new DateOnlyJsonConverter());
+    option.SerializerSettings.Converters.Add(new TimeOnlyJsonConverter());
 });
 
 //添加数据库服务
@@ -97,12 +99,38 @@ builder.Services.AddScoped<UserService,UserService>();
 builder.Services.AddScoped<ShopService,ShopService>();
 builder.Services.AddScoped<AreaService, AreaService>();
 builder.Services.AddScoped<FileService, FileService>();
+builder.Services.AddScoped<OrderService, OrderService>();
+builder.Services.AddScoped<PrinterService, PrinterService>();
+builder.Services.AddScoped<PrintJobService, PrintJobService>();
 builder.Services.AddScoped<Publisher, Publisher>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // 为 Swagger JSON and UI设置xml文档注释路径
+    string? basePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);//获取应用程序所在目录
+    string xmlPath = Path.Combine(basePath!, $"{typeof(Program).Assembly.GetName().Name}.xml");
+    c.IncludeXmlComments(xmlPath, true);
+    c.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "JWT Authorization header using the Bearer scheme."
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "bearerAuth" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 #endregion
 

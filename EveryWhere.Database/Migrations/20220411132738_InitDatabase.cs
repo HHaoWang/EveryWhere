@@ -234,6 +234,7 @@ namespace EveryWhere.Database.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_shop_shopkeeper_id",
                 table: "shop",
+                unique: true,
                 column: "shopkeeper_id");
         }
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EveryWhere.Database.JsonConverter;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Newtonsoft.Json;
 
 namespace EveryWhere.Database.PO;
 
+[Index(nameof(ShopKeeperId), IsUnique = true)]
 [Table("shop")]
 public class Shop:BasePO
 {
@@ -57,6 +59,7 @@ public class Shop:BasePO
     [Comment("店主ID")]
     public int? ShopKeeperId { get; set; }
 
+    [Required]
     [Column("is_opening",TypeName = "tinyint(1)")]
     [Comment("是否营业")]
     public bool? IsOpening { get; set; }

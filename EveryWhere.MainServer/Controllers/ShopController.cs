@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
-using EveryWhere.Database;
 using EveryWhere.Database.PO;
 using EveryWhere.MainServer.Entity.Request;
 using EveryWhere.MainServer.Services;
@@ -15,13 +14,11 @@ namespace EveryWhere.MainServer.Controllers;
 [ApiController]
 public class ShopController : ControllerBase
 {
-    private readonly Repository _repository;
     private readonly ShopService _shopService;
     private readonly ILogger<ShopController> _logger;
 
-    public ShopController(Repository repository, ShopService shopService, ILogger<ShopController> logger)
+    public ShopController(ShopService shopService, ILogger<ShopController> logger)
     {
-        _repository = repository;
         _shopService = shopService;
         _logger = logger;
     }
@@ -58,7 +55,7 @@ public class ShopController : ControllerBase
     public async Task<IActionResult> GetOwnShop()
     {
         int userId = Convert.ToInt32(HttpContext.User.FindFirst(c => c.Type.Equals("UserId", StringComparison.CurrentCultureIgnoreCase))?.Value);
-        Shop? shop = await _shopService.GetByIdAsync(userId);
+        Shop? shop = await _shopService.GetAsync(s=>s.ShopKeeperId == userId);
         return new JsonResult(new
         {
             statusCode = shop==null?404:200,
@@ -74,10 +71,11 @@ public class ShopController : ControllerBase
     public async Task<IActionResult> Post(PostShopRequest request)
     {
         int userId = Convert.ToInt32(HttpContext.User.FindFirst(c => c.Type.Equals("UserId", StringComparison.CurrentCultureIgnoreCase))?.Value);
-        MapperConfiguration config = new MapperConfiguration(cfg 
+        MapperConfiguration config = new(cfg 
             => cfg.CreateMap<PostShopRequest, Shop>());
         Shop? newShop = config.CreateMapper().Map<Shop>(request);
         newShop.ShopKeeperId = userId;
+        newShop.IsOpening = false;
         int affectRows = await _shopService.AddAsync(newShop);
         return new JsonResult(new
         {
@@ -86,16 +84,14 @@ public class ShopController : ControllerBase
     }
 
     [HttpPatch]
-    //[Authorize(Roles = "Shopkeeper,Manager")]
+    [Authorize(Roles = "Shopkeeper,Manager")]
     public async Task<IActionResult> Patch(PatchShopRequest request)
     {
-        //int userId = Convert.ToInt32(HttpContext.User.FindFirst(c => c.Type.Equals("UserId", StringComparison.CurrentCultureIgnoreCase))?.Value);
-        //bool isManager = HttpContext.User.Claims.FirstOrDefault(c =>
-        //    c.ValueType == ClaimTypes.Role && c.Value.Equals("Manager", StringComparison.CurrentCultureIgnoreCase)) != null;
+        int userId = Convert.ToInt32(HttpContext.User.FindFirst(c => c.Type.Equals("UserId", StringComparison.CurrentCultureIgnoreCase))?.Value);
+        bool isManager = HttpContext.User.Claims.FirstOrDefault(c =>
+            c.ValueType == ClaimTypes.Role && c.Value.Equals("Manager", StringComparison.CurrentCultureIgnoreCase)) != null;
         _logger.LogInformation("123");
-        bool isManager = true;
-        int userId = 1;
-        MapperConfiguration config = new MapperConfiguration(cfg
+        MapperConfiguration config = new(cfg
             => cfg.CreateMap<PatchShopRequest, Shop>());
         Shop? newShop = config.CreateMapper().Map<Shop>(request);
 

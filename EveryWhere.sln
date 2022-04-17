@@ -11,15 +11,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveryWhere.DTO", "EveryWher
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{98855BD5-E59A-4A4D-8DDE-A83CB50E77F6}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveryWhere.Database", "EveryWhere.Database\EveryWhere.Database.csproj", "{2037162F-6C9C-4A16-9895-4FEEF28F4920}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EveryWhere.Desktop", "EveryWhere.Desktop\EveryWhere.Desktop.csproj", "{6981731A-65EA-4E41-AE64-FF39501006EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveryWhere.Desktop", "EveryWhere.Desktop\EveryWhere.Desktop.csproj", "{6981731A-65EA-4E41-AE64-FF39501006EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EveryWhere.Desktop.Test", "EveryWhere.Desktop.Test\EveryWhere.Desktop.Test.csproj", "{7FC8C0B1-22D4-425E-A692-076709B90ADD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EveryWhere.Desktop.Test", "EveryWhere.Desktop.Test\EveryWhere.Desktop.Test.csproj", "{7FC8C0B1-22D4-425E-A692-076709B90ADD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

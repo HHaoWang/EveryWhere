@@ -3,6 +3,7 @@ using System;
 using EveryWhere.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EveryWhere.Database.Migrations
 {
     [DbContext(typeof(Repository))]
-    partial class RepositoryModelSnapshot : ModelSnapshot
+    [Migration("20220417075106_ModifyPrinterOrderAndPrintJob")]
+    partial class ModifyPrinterOrderAndPrintJob
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,12 +230,6 @@ namespace EveryWhere.Database.Migrations
                         .HasColumnName("support_duplex")
                         .HasComment("打印机是否支持双面打印");
 
-                    b.Property<string>("SupportSizesJson")
-                        .IsRequired()
-                        .HasColumnType("json")
-                        .HasColumnName("support_sizes")
-                        .HasComment("支持的纸张大小");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ShopId");
@@ -314,12 +310,6 @@ namespace EveryWhere.Database.Migrations
                         .HasColumnName("page_start")
                         .HasComment("打印开始页");
 
-                    b.Property<decimal?>("Price")
-                        .IsRequired()
-                        .HasColumnType("decimal(8,2)")
-                        .HasColumnName("price")
-                        .HasComment("任务价格");
-
                     b.Property<int?>("PrinterId")
                         .IsRequired()
                         .HasColumnType("int(11)")
@@ -372,7 +362,6 @@ namespace EveryWhere.Database.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<bool?>("IsOpening")
-                        .IsRequired()
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_opening")
                         .HasComment("是否营业");
@@ -412,8 +401,7 @@ namespace EveryWhere.Database.Migrations
 
                     b.HasIndex("AreaCode");
 
-                    b.HasIndex("ShopKeeperId")
-                        .IsUnique();
+                    b.HasIndex("ShopKeeperId");
 
                     b.ToTable("shop");
                 });

@@ -38,8 +38,47 @@ public class PrintJob:BasePO
     public int? PrinterId { get; set; }
 
     [Required]
+    [Column("count",TypeName = "int(11)")]
+    [Comment("打印份数")]
+    public int? Count { get; set; }
+
+    [Required]
+    [Column("color", TypeName = "tinyint(1)")]
+    [Comment("彩色打印")]
+    public bool? Color { get; set; }
+
+    [Required]
+    [Column("duplex", TypeName = "tinyint(1)")]
+    [Comment("双面打印")]
+    public bool? Duplex { get; set; }
+
+    [Required]
+    [Column("page_start", TypeName = "int(11)")]
+    [Comment("打印开始页")]
+    public int? PageStart { get; set; }
+
+    [Required]
+    [Column("page_end", TypeName = "int(11)")]
+    [Comment("打印结束页")]
+    public int? PageEnd { get; set; }
+
+    [Required]
+    [Column("page_size", TypeName = "varchar(30)")]
+    [Comment("打印纸张大小")]
+    public string? PageSize { get; set; }
+
+    [Column("fetch_code", TypeName = "varchar(10)")]
+    [Comment("取件码")]
+    public string? FetchCode { get; set; }
+
+    [Required]
     [Column("create_time", TypeName = "datetime")]
     public DateTime? CreateTime { get; set; }
+
+    [Required]
+    [Column("price", TypeName = "decimal(8,2)")]
+    [Comment("任务价格")]
+    public decimal? Price { get; set; }
 
     #region 关联实体
 

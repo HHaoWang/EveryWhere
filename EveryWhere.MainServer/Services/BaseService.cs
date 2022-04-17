@@ -16,9 +16,11 @@ public class BaseService<T> where T:BasePO
         Repository = repository;
     }
 
-    public virtual Task<T?> GetAsync(Expression<Func<T, bool>> predicate)
+    public virtual Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool noTracking = true)
     {
-        return Repository.Set<T>().FirstOrDefaultAsync(predicate);
+        return noTracking
+            ? Repository.Set<T>().AsNoTracking().FirstOrDefaultAsync(predicate)
+            : Repository.Set<T>().FirstOrDefaultAsync(predicate);
     }
 
     public virtual Task<T?> GetByIdAsync(int id)
@@ -31,9 +33,15 @@ public class BaseService<T> where T:BasePO
         return Repository.Set<T>().Where(predicate).ToList();
     }
 
-    public virtual IQueryable<T> GetQuery(Expression<Func<T, bool>> predicate)
+    public virtual IQueryable<T> GetQuery(Expression<Func<T, bool>> predicate, bool noTracking = true)
     {
-        return Repository.Set<T>().Where(predicate);
+        return noTracking ? Repository.Set<T>().AsNoTracking().Where(predicate) 
+            : Repository.Set<T>().Where(predicate);
+    }
+
+    public virtual IQueryable<T> GetQuery(bool noTracking = true)
+    {
+        return noTracking ? Repository.Set<T>().AsNoTracking() : Repository.Set<T>();
     }
 
     public virtual async Task<int> AddAsync(T t)

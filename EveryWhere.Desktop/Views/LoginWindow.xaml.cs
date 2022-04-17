@@ -22,7 +22,7 @@ public partial class LoginWindow : Window
     private readonly HttpClient _httpClient;
     private readonly DispatcherTimer _qrCodeTimer;
     private readonly DispatcherTimer _checkLoginTimer;
-    private string _currentUuid;
+    private string _currentUuid = "";
 
     public LoginWindow()
     {

@@ -16,6 +16,12 @@ public class Order:BasePO
     [Column("create_time", TypeName = "datetime")]
     public DateTime? CreateTime { get; set; }
 
+    [Column("pay_time", TypeName = "datetime")]
+    public DateTime? PayTime { get; set; }
+
+    [Column("complete_time", TypeName = "datetime")]
+    public DateTime? CompleteTime { get; set; }
+
     [Required]
     [Column("consumer_id",TypeName = "int(11)")]
     public int? ConsumerId { get; set; }

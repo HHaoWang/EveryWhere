@@ -3,6 +3,7 @@ using System;
 using EveryWhere.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EveryWhere.Database.Migrations
 {
     [DbContext(typeof(Repository))]
-    partial class RepositoryModelSnapshot : ModelSnapshot
+    [Migration("20220417083549_FixPrinterPagesSizes")]
+    partial class FixPrinterPagesSizes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -314,12 +316,6 @@ namespace EveryWhere.Database.Migrations
                         .HasColumnName("page_start")
                         .HasComment("打印开始页");
 
-                    b.Property<decimal?>("Price")
-                        .IsRequired()
-                        .HasColumnType("decimal(8,2)")
-                        .HasColumnName("price")
-                        .HasComment("任务价格");
-
                     b.Property<int?>("PrinterId")
                         .IsRequired()
                         .HasColumnType("int(11)")
@@ -412,8 +408,7 @@ namespace EveryWhere.Database.Migrations
 
                     b.HasIndex("AreaCode");
 
-                    b.HasIndex("ShopKeeperId")
-                        .IsUnique();
+                    b.HasIndex("ShopKeeperId");
 
                     b.ToTable("shop");
                 });

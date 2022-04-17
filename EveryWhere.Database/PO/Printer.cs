@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace EveryWhere.Database.PO;
 
@@ -24,10 +25,12 @@ public class Printer:BasePO
 
     [Required]
     [Column("shop_id", TypeName = "int(11)")]
+    [Comment("店铺ID")]
     public int? ShopId { get; set; }
 
     [Required]
     [Column("is_work", TypeName = "tinyint(1)")]
+    [Comment("当前是否工作")]
     public bool? IsWork { get; set; }
 
     [Required]
@@ -41,6 +44,11 @@ public class Printer:BasePO
     public bool? SupportDuplex { get; set; }
 
     [Required]
+    [Column("device_name", TypeName = "varchar(120)")]
+    [Comment("打印机在计算机中的物理名称")]
+    public string? DeviceName { get; set; }
+
+    [Required]
     [Column("computer_id", TypeName = "varchar(40)")]
     [Comment("计算机标识")]
     public string? ComputerId { get; set; }
@@ -51,9 +59,9 @@ public class Printer:BasePO
     public string? SupportSizesJson { get; set; }
 
     [NotMapped]
-    public Dictionary<string,PaperSizePrice>? SupportSizes
+    public Dictionary<string,PaperSizePrice> SupportSizes
     {
-        get => JsonConvert.DeserializeObject<Dictionary<string, PaperSizePrice>>(SupportSizesJson??"");
+        get => JsonConvert.DeserializeObject<Dictionary<string, PaperSizePrice>>(SupportSizesJson??"{}")!;
         set => SupportSizesJson = JsonConvert.SerializeObject(value);
     }
 

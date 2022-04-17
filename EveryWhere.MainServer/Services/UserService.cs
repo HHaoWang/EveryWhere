@@ -105,7 +105,7 @@ public class UserService:BaseService<User>
 
         #region 更新session
         //用户session key有变动的话则同步更新至数据库中
-        if (!user.WechatSessionKey.Equals(userInfo.SessionKey))
+        if (!(user.WechatSessionKey??"").Equals(userInfo.SessionKey))
         {
             user.WechatSessionKey = userInfo.SessionKey;
             await Repository.SaveChangesAsync();

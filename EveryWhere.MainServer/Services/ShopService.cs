@@ -11,6 +11,6 @@ public class ShopService:BaseService<Shop>
 
     public List<Shop> GetShopsByAreaCode(string areaCode)
     {
-        return GetAll(s => s.AreaCode.Equals(areaCode));
+        return GetAll(s => s.AreaCode!.Equals(areaCode));
     }
 }
