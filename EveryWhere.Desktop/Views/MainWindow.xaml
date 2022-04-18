@@ -1,0 +1,125 @@
+﻿<Window x:Class="EveryWhere.Desktop.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EveryWhere.Desktop.Views"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:data="clr-namespace:EveryWhere.Desktop.Domain.Printer"
+        xmlns:vm="clr-namespace:EveryWhere.Desktop.ViewModels"
+        mc:Ignorable="d"
+        Title="EveryWhere" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0 1" EndPoint="1 0">
+            <GradientStop Color="#00b8f9" Offset="0.16"/>
+            <GradientStop Color="#0166eb" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+    <Window.Resources>
+        <DataTemplate x:Key="NormalPrinter" DataType="data:Printer">
+            <hc:Card MaxWidth="240" BorderThickness="0"
+                             Effect="{DynamicResource EffectShadow2}" Margin="8"
+                             Footer="{Binding }" Cursor="Hand">
+                <!--Card 的内容部分模板-->
+                <Border CornerRadius="4,4,0,0" Width="160" Height="160">
+                    <Image Source="{Binding DisplayImg}" Height="100"></Image>
+                </Border>
+                <!--Card 的尾部部分模板-->
+                <hc:Card.FooterTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="10" Width="160">
+                            <!--Card 的一级内容-->
+                            <TextBlock TextWrapping="NoWrap" 
+                                               Style="{DynamicResource TextBlockLargeBold}"
+                                               TextTrimming="CharacterEllipsis"
+                                               FontSize="15"
+                                               Text="{Binding DataContext.PrinterName,RelativeSource={RelativeSource AncestorType=hc:Card}}" 
+                                               HorizontalAlignment="Left"/>
+                            <!--Card 的二级内容-->
+                            <TextBlock TextWrapping="NoWrap"
+                                               Style="{DynamicResource TextBlockDefault}"
+                                               TextTrimming="CharacterEllipsis"
+                                               Text="{Binding PhysicalName}"
+                                               FontSize="14"
+                                               Margin="0,6,0,0"
+                                               HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </hc:Card.FooterTemplate>
+            </hc:Card>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AddPrinter">
+            <hc:Card MaxWidth="240" BorderThickness="0"
+                     Effect="{DynamicResource EffectShadow2}" Margin="8" Cursor="Hand" Footer="">
+                <!--Card 的内容部分模板-->
+                <Border CornerRadius="4,4,0,0" Width="160" Height="160">
+                    <Image Source="/Static/Img/add.png" Height="100"></Image>
+                </Border>
+                <!--Card 的尾部部分模板-->
+                <hc:Card.FooterTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="10" Width="160">
+                            <!--Card 的一级内容-->
+                            <TextBlock TextWrapping="NoWrap" 
+                                       Style="{DynamicResource TextBlockLargeBold}"
+                                       TextTrimming="CharacterEllipsis"
+                                       FontSize="15"
+                                       Text="添加打印机" 
+                                       HorizontalAlignment="Left"/>
+                            <!--Card 的二级内容-->
+                            <TextBlock TextWrapping="NoWrap"
+                                       Style="{DynamicResource TextBlockDefault}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Text="点击以添加新的打印机"
+                                       FontSize="14"
+                                       Margin="0,6,0,0"
+                                       HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </hc:Card.FooterTemplate>
+            </hc:Card>
+        </DataTemplate>
+
+        <local:PrinterTemplateSelector x:Key="PrinterTemplateSelector"
+          AddPrinterTemplate="{StaticResource AddPrinter}"
+          NormalPrinterTemplate="{StaticResource NormalPrinter}">
+        </local:PrinterTemplateSelector>
+        
+    </Window.Resources>
+    <DockPanel LastChildFill="False">
+        <DockPanel.Resources>
+            <vm:MainWindowViewModel x:Key="Printer"></vm:MainWindowViewModel>
+        </DockPanel.Resources>
+        <DockPanel.DataContext>
+            <Binding Source="{StaticResource Printer}"></Binding>
+        </DockPanel.DataContext>
+
+        <Grid DockPanel.Dock="Bottom" Height="24" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Ellipse Height="14" Width="14" Fill="LawnGreen" Margin="8 0 4 0" Grid.Column="0"></Ellipse>
+            <TextBlock VerticalAlignment="Center" Grid.Column="1">连接服务器成功！</TextBlock>
+            <TextBlock VerticalAlignment="Center" Grid.Column="3" Margin="0 0 8 0">飞跃打印</TextBlock>
+            <TextBlock Width="auto" Grid.Column="2"></TextBlock>
+        </Grid>
+
+        <ListBox Margin="0" BorderThickness="0"
+                 Style="{DynamicResource WrapPanelHorizontalListBox}"
+                 ItemsSource="{Binding Printers}"
+                 ItemTemplateSelector="{StaticResource PrinterTemplateSelector}"
+                 DockPanel.Dock="Top" Background="{x:Null}">
+            <ListBox.Resources>
+                
+            </ListBox.Resources>
+        </ListBox>
+
+    </DockPanel>
+</Window>
