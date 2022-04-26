@@ -24,6 +24,7 @@
   <ItemGroup>
     <PackageReference Include="HandyControl" Version="3.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="QRCoder" Version="1.4.3" />
     <PackageReference Include="QRCoder.Xaml" Version="1.4.3" />
@@ -39,10 +40,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Domain\PaperSize\" />
+    <Folder Include="Entity\Response\" />
+    <Folder Include="UITools\Converters\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EveryWhere.Database\EveryWhere.Database.csproj" />
     <ProjectReference Include="..\EveryWhere.DTO\EveryWhere.DTO.csproj" />
   </ItemGroup>
 

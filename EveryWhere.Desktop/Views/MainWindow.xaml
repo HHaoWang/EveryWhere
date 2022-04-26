@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EveryWhere.Desktop.Views"
         xmlns:hc="https://handyorg.github.io/handycontrol"
-        xmlns:data="clr-namespace:EveryWhere.Desktop.Domain.Printer"
-        xmlns:vm="clr-namespace:EveryWhere.Desktop.ViewModels"
+        xmlns:printer="clr-namespace:EveryWhere.Desktop.Domain.Printer"
         mc:Ignorable="d"
-        Title="EveryWhere" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
+        Title="EveryWhere" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
     <Window.Background>
         <LinearGradientBrush StartPoint="0 1" EndPoint="1 0">
             <GradientStop Color="#00b8f9" Offset="0.16"/>
@@ -16,7 +16,7 @@
         </LinearGradientBrush>
     </Window.Background>
     <Window.Resources>
-        <DataTemplate x:Key="NormalPrinter" DataType="data:Printer">
+        <DataTemplate x:Key="NormalPrinter" DataType="printer:Printer">
             <hc:Card MaxWidth="240" BorderThickness="0"
                              Effect="{DynamicResource EffectShadow2}" Margin="8"
                              Footer="{Binding }" Cursor="Hand">
@@ -50,8 +50,9 @@
         </DataTemplate>
 
         <DataTemplate x:Key="AddPrinter">
-            <hc:Card MaxWidth="240" BorderThickness="0"
-                     Effect="{DynamicResource EffectShadow2}" Margin="8" Cursor="Hand" Footer="">
+            <hc:Card MaxWidth="240" BorderThickness="0" 
+                     Effect="{DynamicResource EffectShadow2}"
+                     Margin="8" Cursor="Hand" Footer="" MouseUp="OnAddPrinter">
                 <!--Card 的内容部分模板-->
                 <Border CornerRadius="4,4,0,0" Width="160" Height="160">
                     <Image Source="/Static/Img/add.png" Height="100"></Image>
@@ -87,14 +88,9 @@
         </local:PrinterTemplateSelector>
         
     </Window.Resources>
-    <DockPanel LastChildFill="False">
-        <DockPanel.Resources>
-            <vm:MainWindowViewModel x:Key="Printer"></vm:MainWindowViewModel>
-        </DockPanel.Resources>
-        <DockPanel.DataContext>
-            <Binding Source="{StaticResource Printer}"></Binding>
-        </DockPanel.DataContext>
+    <DockPanel>
 
+        <!--底栏-->
         <Grid DockPanel.Dock="Bottom" Height="24" VerticalAlignment="Center" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -109,9 +105,11 @@
             <TextBlock Width="auto" Grid.Column="2"></TextBlock>
         </Grid>
 
+        <!--打印机列表-->
         <ListBox Margin="0" BorderThickness="0"
                  Style="{DynamicResource WrapPanelHorizontalListBox}"
-                 ItemsSource="{Binding Printers}"
+                 ItemsSource="{Binding Printers, Mode=OneWay}"
+                 HorizontalAlignment="Left" VerticalAlignment="Top"
                  ItemTemplateSelector="{StaticResource PrinterTemplateSelector}"
                  DockPanel.Dock="Top" Background="{x:Null}">
         </ListBox>

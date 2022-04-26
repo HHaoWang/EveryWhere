@@ -8,9 +8,8 @@ namespace EveryWhere.Desktop;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
+public partial class App
 {
-
     protected override void OnStartup(StartupEventArgs e)
     {
         _ = new Mutex(true, "EveryWhere.Desktop:SingleInstanceApp", out bool createdNew);
@@ -24,6 +23,7 @@ public partial class App : Application
         LoginWindow loginWindow = new();
         if (loginWindow.ShowDialog() == true)
         {
+            Properties["Token"] = loginWindow.Token;
             base.OnStartup(e);
             Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
         }

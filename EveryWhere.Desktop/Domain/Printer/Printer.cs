@@ -6,9 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Printing;
-using Serilog;
 using System.IO;
-using System.IO.Packaging;
 using System.Windows.Documents;
 using System.Windows.Xps;
 using System.Windows.Xps.Packaging;
@@ -35,6 +33,8 @@ public class Printer
             => duplex == Duplexing.TwoSidedLongEdge || duplex == Duplexing.TwoSidedShortEdge,
             computedValue=>computedValue);
 
+    public bool SupportDuplexColor => SupportColor && SupportDuplex;
+
     public List<PageMediaSizeName> SupportSizeNames =>
         _capabilities!.PageMediaSizeCapability
             .Select(s => s.PageMediaSizeName)
@@ -44,7 +44,7 @@ public class Printer
 
     public string DisplayImg => IsOffline ? "/Static/Img/printer-offline.png" : "/Static/Img/printer.png";
 
-    public List<PrintSystemJobInfo> JobInfos { get; set; } = new();
+    private List<PrintSystemJobInfo> JobInfos { get; set; } = new();
 
     #endregion
 

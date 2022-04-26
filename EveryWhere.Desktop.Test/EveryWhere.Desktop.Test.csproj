@@ -21,4 +21,8 @@
     <ProjectReference Include="..\EveryWhere.Desktop\EveryWhere.Desktop.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="PaperSizeTest\" />
+  </ItemGroup>
+
 </Project>

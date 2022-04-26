@@ -21,11 +21,4 @@ public class Tests
         List<Printer> printers = Printer.GetLocalPrinters();
         Assert.IsFalse(printers.Exists(p=>p.PrinterName.Equals("Canon MG2400 series Printer",StringComparison.CurrentCultureIgnoreCase) && p.IsOffline));
     }
-    
-    [Test]
-    public void Test2()
-    {
-        Printer.SplitXpsIntoTemp(new FileInfo(@"D:\test_doc_out.xps"),0,5);
-        Assert.IsFalse(false);
-    }
 }

@@ -8,20 +8,21 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using EveryWhere.DTO.Entity;
 using System.Windows.Threading;
+using EveryWhere.Desktop.Entity.Response;
 using QRCoder.Xaml;
-using Window = System.Windows.Window;
 
 namespace EveryWhere.Desktop.Views;
 
 /// <summary>
 /// LoginWindow.xaml 的交互逻辑
 /// </summary>
-public partial class LoginWindow : Window
+public partial class LoginWindow
 {
     private readonly HttpClient _httpClient;
     private readonly DispatcherTimer _qrCodeTimer;
     private readonly DispatcherTimer _checkLoginTimer;
     private string _currentUuid = "";
+    public string Token = "";
 
     public LoginWindow()
     {
@@ -56,6 +57,7 @@ public partial class LoginWindow : Window
             return;
         }
 
+        Token = loginInfoResponse.Data!.Token ?? "";
         TipText.Text = "登录成功！";
         _checkLoginTimer.Stop();
         await Task.Delay(2000);
@@ -109,19 +111,10 @@ public partial class LoginWindow : Window
         return qrCodeImage.GetGraphic(20);
     }
 
-    public class QrCodeUuidResponse
-    {
-        public string? Uuid { get; set; }
-    }
-
-    public class CheckLoginValidResponse
-    {
-        public string? Token { get; set; }
-    }
-
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         _qrCodeTimer.Stop();
         _checkLoginTimer.Stop();
+        _httpClient.Dispose();
     }
 }
