@@ -3,7 +3,8 @@ using EveryWhere.Database;
 using EveryWhere.Database.JsonConverter;
 using EveryWhere.DTO.Settings;
 using EveryWhere.MainServer.Entity.Setting;
-using EveryWhere.MainServer.MessageQueue;
+using EveryWhere.MainServer.Infrastructure.MessageQueue;
+using EveryWhere.MainServer.Infrastructure.Websocket;
 using EveryWhere.MainServer.Services;
 using EveryWhere.MainServer.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -104,6 +105,8 @@ builder.Services.AddScoped<PrinterService, PrinterService>();
 builder.Services.AddScoped<PrintJobService, PrintJobService>();
 builder.Services.AddScoped<Publisher, Publisher>();
 
+builder.Services.AddSingleton<Hub,Hub>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -158,6 +161,8 @@ app.UseRouting();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseWebSockets();
 
 app.MapControllers();
 

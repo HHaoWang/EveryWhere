@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System.Text;
+﻿using System.Text;
 using EveryWhere.MainServer.Entity.Setting;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using File = EveryWhere.Database.PO.File;
 
-namespace EveryWhere.MainServer.MessageQueue;
+namespace EveryWhere.MainServer.Infrastructure.MessageQueue;
 
 public class Publisher
 {

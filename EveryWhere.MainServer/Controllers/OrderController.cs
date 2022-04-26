@@ -301,4 +301,40 @@ public class OrderController : ControllerBase
             };
         }
     }
+
+    /// <summary>
+    /// 完成打印任务(仅商家)
+    /// </summary>
+    /// <param name="jobId">打印任务ID</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Authorize(Roles = "Shopkeeper")]
+    [Route("PrintJob/{jobId:int}/Finish")]
+    public async Task<IActionResult> FinishPrintJob(int jobId)
+    {
+        try
+        {
+            Order order = await _orderService.FinishPrintJob(jobId);
+            return new JsonResult(new
+            {
+                statusCode = 200,
+                data = new
+                {
+                    order
+                }
+            });
+        }
+        catch (EntityNotFoundException e)
+        {
+            _logger.LogError(e.Message);
+            return new JsonResult(new
+            {
+                statusCode = 500,
+                message = "服务器错误"+e.Message
+            })
+            {
+                StatusCode = 500
+            };
+        }
+    }
 }

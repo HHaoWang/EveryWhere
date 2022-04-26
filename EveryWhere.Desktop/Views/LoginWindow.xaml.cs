@@ -1,7 +1,6 @@
 ﻿using QRCoder;
 using System;
 using System.Diagnostics;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Newtonsoft.Json;
@@ -47,9 +46,6 @@ public partial class LoginWindow : Window
 
     private async void CheckIsLogin(object? sender, EventArgs e)
     {
-        DialogResult = true;
-        Close();
-        return;
         string checkValidUrl = $"https://everywhere.hhao.wang/api/Login/QRCode/{_currentUuid}/Valid";
         string loginInfoResponseStr = await _httpClient.GetStringAsync(checkValidUrl);
         BaseResponse<CheckLoginValidResponse>? loginInfoResponse = JsonConvert

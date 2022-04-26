@@ -1,7 +1,7 @@
 ﻿using ByteSizeLib;
 using EveryWhere.Database;
 using EveryWhere.Database.PO;
-using EveryWhere.MainServer.MessageQueue;
+using EveryWhere.MainServer.Infrastructure.MessageQueue;
 using EveryWhere.MainServer.Utils;
 using File = EveryWhere.Database.PO.File;
 

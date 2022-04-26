@@ -44,6 +44,8 @@ public class Printer
 
     public string DisplayImg => IsOffline ? "/Static/Img/printer-offline.png" : "/Static/Img/printer.png";
 
+    public List<PrintSystemJobInfo> JobInfos { get; set; } = new();
+
     #endregion
 
     public Printer(){}
@@ -84,6 +86,16 @@ public class Printer
         return localPrinters;
     }
 
+    /// <summary>
+    /// 打印XPS文件
+    /// </summary>
+    /// <param name="file">XPS文件</param>
+    /// <param name="pageStart">起始页</param>
+    /// <param name="pageEnd">结束页</param>
+    /// <param name="count">份数</param>
+    /// <param name="color">是否彩印</param>
+    /// <param name="duplex">是否正反印刷</param>
+    /// <param name="size">纸张大小</param>
     public void PrintXps(FileInfo file,int pageStart,int pageEnd,int count,bool color,bool duplex,string size)
     {
         try
@@ -124,13 +136,13 @@ public class Printer
             {
                 case "A4":
                     ticket.PageMediaSize =
-                        _capabilities?.PageMediaSizeCapability.First(
-                            p => p.PageMediaSizeName == PageMediaSizeName.ISOA4);
+                        _capabilities?.PageMediaSizeCapability.FirstOrDefault(
+                            p => p.PageMediaSizeName == PageMediaSizeName.ISOA4) ?? ticket.PageMediaSize;
                     break;
                 case "A3":
                     ticket.PageMediaSize =
-                        _capabilities?.PageMediaSizeCapability.First(
-                            p => p.PageMediaSizeName == PageMediaSizeName.ISOA3);
+                        _capabilities?.PageMediaSizeCapability.FirstOrDefault(
+                            p => p.PageMediaSizeName == PageMediaSizeName.ISOA3) ?? ticket.PageMediaSize;
                     break;
                 default:
                     break;
@@ -139,7 +151,16 @@ public class Printer
             //打印范围
             SplitXpsIntoTemp(file,pageStart,pageEnd);
 
-            _queue?.AddJob(file.Name, file.FullName + ".temp", false, new PrintTicket());
+            PrintSystemJobInfo? jobInfo = _queue?.AddJob(file.Name, file.FullName + ".temp", false, new PrintTicket());
+
+            if (jobInfo==null)
+            {
+                Debug.WriteLine("添加打印任务失败！");
+                return;
+            }
+
+            jobInfo.Refresh();
+            JobInfos.Add(jobInfo);
 
             XpsDocumentWriter xpsDocumentWriter = PrintQueue.CreateXpsDocumentWriter(_queue);
             xpsDocumentWriter.Write(file.FullName);
@@ -150,6 +171,12 @@ public class Printer
         }
     }
 
+    /// <summary>
+    /// 提取xps文件中的指定页，以原文件名加“.temp”保存在原路径中
+    /// </summary>
+    /// <param name="file">要提取的XPS文件</param>
+    /// <param name="pageStart">起始页</param>
+    /// <param name="pageEnd">结束页</param>
     public static void SplitXpsIntoTemp(FileInfo file, int pageStart, int pageEnd)
     {
         List<PageContent> pages = new();

@@ -96,18 +96,16 @@
         </DockPanel.DataContext>
 
         <Grid DockPanel.Dock="Bottom" Height="24" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-            <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Ellipse Height="14" Width="14" Fill="LawnGreen" Margin="8 0 4 0" Grid.Column="0"></Ellipse>
-            <TextBlock VerticalAlignment="Center" Grid.Column="1">连接服务器成功！</TextBlock>
-            <TextBlock VerticalAlignment="Center" Grid.Column="3" Margin="0 0 8 0">飞跃打印</TextBlock>
+            <Ellipse Height="14" Width="14" Fill="LawnGreen" Name="StateLight"
+                     Margin="8 0 4 0" Grid.Column="0"></Ellipse>
+            <TextBlock VerticalAlignment="Center" Grid.Column="1" Name="StateText">连接服务器成功！</TextBlock>
+            <TextBlock VerticalAlignment="Center" Grid.Column="3" Margin="0 0 8 0" Name="ShopName">飞跃打印</TextBlock>
             <TextBlock Width="auto" Grid.Column="2"></TextBlock>
         </Grid>
 
@@ -116,9 +114,6 @@
                  ItemsSource="{Binding Printers}"
                  ItemTemplateSelector="{StaticResource PrinterTemplateSelector}"
                  DockPanel.Dock="Top" Background="{x:Null}">
-            <ListBox.Resources>
-                
-            </ListBox.Resources>
         </ListBox>
 
     </DockPanel>

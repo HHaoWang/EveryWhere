@@ -117,4 +117,29 @@ public class ShopController : ControllerBase
             statusCode = affectRows > 0 ? 200 : 500
         });
     }
+
+    /// <summary>
+    /// 管理端获取商家信息
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Authorize(Roles = "Manager")]
+    public IActionResult GetShops()
+    {
+        List<Shop> shops = _shopService.GetQuery()
+            .Include(s => s.Printers)
+            .Include(s => s.Area)
+            .ThenInclude(a => a!.ParentArea)
+            .ThenInclude(a => a!.ParentArea)
+            .ToList();
+
+        return new JsonResult(new
+        {
+            statusCode = 200,
+            data = new
+            {
+                shops
+            }
+        });
+    }
 }
