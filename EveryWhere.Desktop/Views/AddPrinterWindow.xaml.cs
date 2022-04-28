@@ -2,12 +2,21 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using EveryWhere.Desktop.Domain.PaperSize;
 using EveryWhere.Desktop.Domain.Printer;
+using EveryWhere.DTO.Entity;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
@@ -20,6 +29,30 @@ public sealed partial class AddPrinterWindow:INotifyPropertyChanged
 {
     public List<Printer>? Printers { get; set; }
     public ObservableCollection<PrinterPrice> Prices { get; set; } = new();
+    private static Guid MachineGuid
+    {
+        get
+        {
+            Guid machineGuid = Guid.Empty;
+
+            RegistryKey localMachineX64View = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            RegistryKey? cryptographySubKey = localMachineX64View.OpenSubKey(@"SOFTWARE\Microsoft\Cryptography");
+
+            if (cryptographySubKey == null) return machineGuid;
+
+            string? machineGuidValue = (string?)cryptographySubKey.GetValue("MachineGuid");
+
+            if (!Guid.TryParse(machineGuidValue, out machineGuid))
+            {
+                machineGuid = Guid.Empty;
+            }
+
+            return machineGuid;
+        }
+    }
+    private HttpClient? _httpClient = new();
+    private const string BaseUrl = "https://everywhere.hhao.wang";
+    private int _shopId;
 
     public Printer? CurrentPrinter => Printers == null || PrinterSelector.SelectedIndex<0 ? null : Printers![PrinterSelector.SelectedIndex];
 
@@ -105,8 +138,9 @@ public sealed partial class AddPrinterWindow:INotifyPropertyChanged
 
     public Visibility ShowPricesTable { get; set; } = Visibility.Hidden;
 
-    public AddPrinterWindow()
+    public AddPrinterWindow(int shopId)
     {
+        _shopId = shopId;
         InitializeComponent();
         DataContext = this;
         Init();
@@ -158,6 +192,91 @@ public sealed partial class AddPrinterWindow:INotifyPropertyChanged
             OnPropertyChanged(nameof(AvailableSize));
         }
         e.Cancel = false;
+    }
+
+
+    private async void OnSubmit(object sender, RoutedEventArgs e)
+    {
+        Dictionary<string, NewPrinter.PaperSizePrice> size = new();
+        foreach (PrinterPrice printerPrice in Prices)
+        {
+            if (string.IsNullOrWhiteSpace(printerPrice.Size))
+            {
+                continue;
+            }
+            size.Add(printerPrice.Size,new NewPrinter.PaperSizePrice()
+            {
+                SingleBlack = printerPrice.SingleBlack,
+                DuplexBlack = printerPrice.DuplexBlack,
+                SingleColor = printerPrice.SingleColor,
+                DuplexColor = printerPrice.DuplexColor
+            });
+        }
+
+        NewPrinter printer = new()
+        {
+            ComputerId = MachineGuid.ToString(),
+            DeviceName = CurrentPrinter!.PhysicalName,
+            IsWork = false,
+            Name = string.IsNullOrWhiteSpace(DisplayName.Text) ? CurrentPrinter!.PhysicalName : DisplayName.Text.Trim(),
+            SupportColor = SupportColor,
+            SupportDuplex = SupportDuplex,
+            SupportSizes = size,
+            ShopId = _shopId
+        };
+
+        _httpClient ??= new HttpClient();
+        _httpClient.DefaultRequestHeaders.Clear();
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + Application.Current.Properties["Token"]);
+       
+        StringContent content = new(JsonConvert.SerializeObject(printer), Encoding.UTF8, "application/json");
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        HttpResponseMessage response = await _httpClient.SendAsync(new HttpRequestMessage()
+        {
+            Content = content,
+            Method = HttpMethod.Post,
+            RequestUri = new Uri($"{BaseUrl}/api/Printer")
+        });
+        Debug.WriteLine(await response.Content.ReadAsStringAsync());
+        if (response.IsSuccessStatusCode)
+        {
+            DialogResult = true;
+            Close();
+        }
+        else
+        {
+            MessageBox.Show("服务器添加打印机失败！请检查是否已经添加过该打印机并重试，若反复失败请联系技术支持人员。");
+        }
+    }
+
+    private async Task<string> RequestAsync(string url, string content, HttpMethod method,
+        List<(string, string)>? headers = null)
+    {
+        if (headers != null)
+        {
+            foreach ((string? headerName, string? _) in headers)
+            {
+                _httpClient!.DefaultRequestHeaders.Remove(headerName);
+            }
+            foreach ((string? headerName, string? headerValue) in headers)
+            {
+                _httpClient!.DefaultRequestHeaders.Add(headerName, headerValue);
+            }
+        }
+
+        HttpResponseMessage response = await _httpClient!.SendAsync(new HttpRequestMessage
+        {
+            Content = new StringContent(content),
+            Method = method,
+            RequestUri = new Uri(url)
+        });
+        return await response.Content.ReadAsStringAsync();
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        _httpClient?.Dispose();
+        base.OnClosing(e);
     }
 }
 

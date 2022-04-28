@@ -124,7 +124,7 @@ public class ConvertFileService : BackgroundService
 
             file.IsConverted = true;
             file.PageCount = pageCount;
-            file.Location = _configuration["serverHost"] + "/api/File/Converted/Wps/" + file.Name;
+            file.Location = _configuration["serverHost"] + "/api/File/Converted/Xps/" + file.Name;
 
             await repository.SaveChangesAsync();
         }

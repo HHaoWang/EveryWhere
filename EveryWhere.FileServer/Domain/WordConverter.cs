@@ -20,7 +20,7 @@ public class WordConverter:FileConverter
             application.Visible = false;
             document = documents.Open(sourcePath);
             pageCount = document.ComputeStatistics(WdStatistic.wdStatisticPages);
-            string pdfPath = Path.Combine(FileUtil.GetWpsFileDirectory().FullName, targetName + ".xps");
+            string pdfPath = Path.Combine(FileUtil.GetXpsFileDirectory().FullName, targetName + ".xps");
             document.ExportAsFixedFormat(pdfPath, WdExportFormat.wdExportFormatXPS);
             result = true;
         }
@@ -57,7 +57,7 @@ public class WordConverter:FileConverter
             application.Visible = false;
             document = documents.Open(sourcePath);
             pageCount = document.ComputeStatistics(WdStatistic.wdStatisticPages);
-            string xpsPath = Path.Combine(FileUtil.GetWpsFileDirectory().FullName, targetName + ".xps");
+            string xpsPath = Path.Combine(FileUtil.GetXpsFileDirectory().FullName, targetName + ".xps");
             document.ExportAsFixedFormat(xpsPath, WdExportFormat.wdExportFormatXPS);
             result = true;
         }
@@ -95,7 +95,7 @@ public class WordConverter:FileConverter
             document = documents.Open(sourcePath);
             pageCount = document.ComputeStatistics(WdStatistic.wdStatisticPages);
             string pdfPath = Path.Combine(FileUtil.GetPdfFileDirectory().FullName, targetName + ".pdf");
-            string xpsPath = Path.Combine(FileUtil.GetWpsFileDirectory().FullName, targetName + ".xps");
+            string xpsPath = Path.Combine(FileUtil.GetXpsFileDirectory().FullName, targetName + ".xps");
             document.ExportAsFixedFormat(pdfPath, WdExportFormat.wdExportFormatPDF);
             document.ExportAsFixedFormat(xpsPath, WdExportFormat.wdExportFormatXPS);
             result = true;

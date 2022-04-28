@@ -2,11 +2,13 @@
 using System.Runtime.InteropServices;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Printing;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Windows.Documents;
 using System.Windows.Xps;
 using System.Windows.Xps.Packaging;
@@ -14,26 +16,27 @@ using System.Windows.Markup;
 
 namespace EveryWhere.Desktop.Domain.Printer;
 
-public class Printer
+public sealed class Printer:INotifyPropertyChanged
 {
     #region Fields
 
-    private readonly PrinterInfo? _printerInfo;
     private readonly PrintQueue? _queue;
     private readonly PrintCapabilities? _capabilities;
+    private readonly List<int> _jobIdList = new();
+    private readonly Dictionary<int, PrintSystemJobInfo> _printingJobs = new();
 
+    public int? Id { get; set; } = -1;
     public bool IsVirtual = false;
-    public string PhysicalName => _printerInfo!.PrinterName;
-    public string PrinterName => (IsOffline?"(离线)":"")+_printerInfo!.PrinterName;
-    public bool IsOffline => _printerInfo!.isOffLine;
+    public string PhysicalName { get; }
+    public string PrinterName { get; set; }
+    public string DisplayName => (IsOffline ? "(离线)" : "") + PrinterName;
+    public bool IsOffline { get; private set; }
     public bool SupportColor => _capabilities!.OutputColorCapability.Contains(OutputColor.Color);
     public bool SupportDuplex => _capabilities!
         .DuplexingCapability
-        .Aggregate(false, (supportDuplex, duplex) 
+        .Aggregate(false, (_, duplex) 
             => duplex == Duplexing.TwoSidedLongEdge || duplex == Duplexing.TwoSidedShortEdge,
             computedValue=>computedValue);
-
-    public bool SupportDuplexColor => SupportColor && SupportDuplex;
 
     public List<PageMediaSizeName> SupportSizeNames =>
         _capabilities!.PageMediaSizeCapability
@@ -44,17 +47,34 @@ public class Printer
 
     public string DisplayImg => IsOffline ? "/Static/Img/printer-offline.png" : "/Static/Img/printer.png";
 
-    private List<PrintSystemJobInfo> JobInfos { get; set; } = new();
+    public event EventHandler<int>? OnJobFinished; 
 
     #endregion
 
+#pragma warning disable CS8618
     public Printer(){}
+#pragma warning restore CS8618
 
     private Printer(PrinterInfo printerInfo)
     {
-        _printerInfo = printerInfo;
+        IsOffline = printerInfo.isOffLine;
+        PhysicalName = printerInfo.PrinterName;
+        PrinterName = printerInfo.PrinterName;
         _queue = new LocalPrintServer().GetPrintQueue(PhysicalName);
         _capabilities = _queue.GetPrintCapabilities();
+    }
+
+    public void Refresh()
+    {
+        if (IsVirtual)
+        {
+            return;
+        }
+        Printer? newPrinter = GetLocalPrinters().Find(p => p.PhysicalName == PhysicalName);
+        IsOffline = newPrinter is not {IsOffline: false};
+        OnPropertyChanged(nameof(IsOffline));
+        OnPropertyChanged(nameof(DisplayName));
+        OnPropertyChanged(nameof(DisplayImg));
     }
 
     public static List<Printer> GetLocalPrinters()
@@ -86,6 +106,30 @@ public class Printer
         return localPrinters;
     }
 
+    public bool ExistsJob(int jobId)
+    {
+        return _jobIdList.Contains(jobId) || _printingJobs.ContainsKey(jobId);
+    }
+
+    public void AddPrintJob(FileInfo file, int pageStart, int pageEnd, int count, bool color, bool duplex, string size,int jobId)
+    {
+        if (_jobIdList.Contains(jobId))
+        {
+            return;
+        }
+        _jobIdList.Add(jobId);
+        PrintXps(file,pageStart,pageEnd,count,color,duplex,size);
+        DateTime submitTime = DateTime.Now.ToUniversalTime();
+        PrintJobInfoCollection? infoCollection = _queue!.GetPrintJobInfoCollection();
+        foreach (PrintSystemJobInfo jobInfo in infoCollection)
+        {
+            if (jobInfo.TimeJobSubmitted.Subtract(submitTime) < TimeSpan.FromSeconds(3) && jobInfo.NumberOfPages == pageEnd - pageStart + 1)
+            {
+                _printingJobs.Add(jobId,jobInfo);
+            }
+        }
+    }
+
     /// <summary>
     /// 打印XPS文件
     /// </summary>
@@ -96,7 +140,7 @@ public class Printer
     /// <param name="color">是否彩印</param>
     /// <param name="duplex">是否正反印刷</param>
     /// <param name="size">纸张大小</param>
-    public void PrintXps(FileInfo file,int pageStart,int pageEnd,int count,bool color,bool duplex,string size)
+    private void PrintXps(FileInfo file,int pageStart,int pageEnd,int count,bool color,bool duplex,string size)
     {
         try
         {
@@ -108,7 +152,7 @@ public class Printer
                 ticket.Collation = Collation.Collated;
             }
 
-            //彩印
+            //双页打印
             if (duplex && _capabilities?.DuplexingCapability.Contains(Duplexing.TwoSidedLongEdge) == true)
             {
                 ticket.Duplexing = Duplexing.TwoSidedLongEdge;
@@ -118,7 +162,7 @@ public class Printer
                 ticket.Duplexing = Duplexing.OneSided;
             }
 
-            //双页打印
+            //彩印
             if (color && _capabilities?.OutputColorCapability.Contains(OutputColor.Color) == true)
             {
                 ticket.OutputColor = OutputColor.Color;
@@ -144,29 +188,31 @@ public class Printer
                         _capabilities?.PageMediaSizeCapability.FirstOrDefault(
                             p => p.PageMediaSizeName == PageMediaSizeName.ISOA3) ?? ticket.PageMediaSize;
                     break;
-                default:
-                    break;
             }
 
             //打印范围
             SplitXpsIntoTemp(file,pageStart,pageEnd);
 
-            PrintSystemJobInfo? jobInfo = _queue?.AddJob(file.Name, file.FullName + ".temp", false, new PrintTicket());
+            XpsDocument xpsFile = new(file.FullName + ".temp", FileAccess.Read);
 
-            if (jobInfo==null)
-            {
-                Debug.WriteLine("添加打印任务失败！");
-                return;
-            }
+            XpsDocumentWriter writer = PrintQueue.CreateXpsDocumentWriter(_queue);
+            writer.Write(xpsFile.GetFixedDocumentSequence(),ticket);
 
-            jobInfo.Refresh();
-            JobInfos.Add(jobInfo);
+            //PrintSystemJobInfo? jobInfo = _queue?.AddJob(file.Name, file.FullName + ".temp", _queue.IsXpsDevice);
+            Debug.WriteLine("添加打印任务到队列完成");
 
-            XpsDocumentWriter xpsDocumentWriter = PrintQueue.CreateXpsDocumentWriter(_queue);
-            xpsDocumentWriter.Write(file.FullName);
+            //if (jobInfo==null)
+            //{
+            //    Debug.WriteLine("添加打印任务失败！");
+            //    return;
+            //}
+
+            //jobInfo.Refresh();
+            //JobInfos.Add(jobInfo);
         }
         catch (PrintJobException e)
         {
+            Debug.WriteLine("添加打印任务到队列失败！");
             Debug.WriteLine(e.Message);
         }
     }
@@ -177,7 +223,7 @@ public class Printer
     /// <param name="file">要提取的XPS文件</param>
     /// <param name="pageStart">起始页</param>
     /// <param name="pageEnd">结束页</param>
-    public static void SplitXpsIntoTemp(FileInfo file, int pageStart, int pageEnd)
+    private static void SplitXpsIntoTemp(FileInfo file, int pageStart, int pageEnd)
     {
         List<PageContent> pages = new();
 
@@ -196,7 +242,7 @@ public class Printer
             {
                 continue;
             }
-            pages.Add(oldPages[i]);
+            pages.Add(oldPages[i-1]);
         }
 
         string savePath = file.FullName + ".temp";
@@ -225,6 +271,23 @@ public class Printer
         xpsOutputDoc.Close();
     }
 
+    public void CheckJobsState()
+    {
+        foreach (KeyValuePair<int, PrintSystemJobInfo> pair in _printingJobs)
+        {
+            pair.Value.Refresh();
+            if (!pair.Value.IsDeleted && !pair.Value.IsCompleted) continue;
+            Debug.WriteLine("检测到打印任务已完成");
+            OnJobFinished?.Invoke(this, pair.Key);
+        }
+    }
+
+    public void RemoveJob(int jobId)
+    {
+        _printingJobs.Remove(jobId);
+        _jobIdList.Remove(jobId);
+    }
+
     #region 引用 WindowsAPI
 
     // 引用API声明
@@ -249,4 +312,11 @@ public class Printer
     
 
     #endregion
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }

@@ -82,7 +82,7 @@ public static class FileUtil
     /// 获取转换后的XPS文件存放路径
     /// </summary>
     /// <returns>完整的转换后的XPS文件存放路径</returns>
-    public static DirectoryInfo GetWpsFileDirectory()
+    public static DirectoryInfo GetXpsFileDirectory()
     {
         DirectoryInfo convertedFileDirectory = GetConvertedFileDirectory();
         DirectoryInfo directory = new(Path.Combine(convertedFileDirectory.FullName, "xps"));

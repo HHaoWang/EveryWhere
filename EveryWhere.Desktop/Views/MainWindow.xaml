@@ -33,7 +33,7 @@
                                                Style="{DynamicResource TextBlockLargeBold}"
                                                TextTrimming="CharacterEllipsis"
                                                FontSize="15"
-                                               Text="{Binding DataContext.PrinterName,RelativeSource={RelativeSource AncestorType=hc:Card}}" 
+                                               Text="{Binding DataContext.DisplayName,RelativeSource={RelativeSource AncestorType=hc:Card}}" 
                                                HorizontalAlignment="Left"/>
                             <!--Card 的二级内容-->
                             <TextBlock TextWrapping="NoWrap"
@@ -89,7 +89,6 @@
         
     </Window.Resources>
     <DockPanel>
-
         <!--底栏-->
         <Grid DockPanel.Dock="Bottom" Height="24" VerticalAlignment="Center" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
@@ -101,14 +100,14 @@
             <Ellipse Height="14" Width="14" Fill="LawnGreen" Name="StateLight"
                      Margin="8 0 4 0" Grid.Column="0"></Ellipse>
             <TextBlock VerticalAlignment="Center" Grid.Column="1" Name="StateText">连接服务器成功！</TextBlock>
-            <TextBlock VerticalAlignment="Center" Grid.Column="3" Margin="0 0 8 0" Name="ShopName">飞跃打印</TextBlock>
+            <TextBlock VerticalAlignment="Center" Grid.Column="3" Margin="0 0 8 0" Name="ShopName"></TextBlock>
             <TextBlock Width="auto" Grid.Column="2"></TextBlock>
         </Grid>
 
         <!--打印机列表-->
         <ListBox Margin="0" BorderThickness="0"
                  Style="{DynamicResource WrapPanelHorizontalListBox}"
-                 ItemsSource="{Binding Printers, Mode=OneWay}"
+                 ItemsSource="{Binding Printers, Mode=TwoWay}"
                  HorizontalAlignment="Left" VerticalAlignment="Top"
                  ItemTemplateSelector="{StaticResource PrinterTemplateSelector}"
                  DockPanel.Dock="Top" Background="{x:Null}">

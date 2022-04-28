@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 
 namespace EveryWhere.Database.PO;
 
+[Index(nameof(DeviceName),nameof(ComputerId),IsUnique = true)]
 [Table("printer")]
 public class Printer:BasePO
 {

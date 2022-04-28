@@ -8,7 +8,7 @@
         xmlns:converters="clr-namespace:EveryWhere.Desktop.UITools.Converters"
         mc:Ignorable="d"
         Title="添加打印机" Height="500" Width="600"
-        ResizeMode="CanMinimize" WindowStartupLocation="CenterOwner" Name="Window">
+        ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Name="Window">
     <Window.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <!--表格列-->
@@ -49,10 +49,14 @@
                      hc:InfoElement.Placeholder=""
                      hc:InfoElement.TitlePlacement="Left"
                      hc:InfoElement.Title="选择打印机"
-                     Margin="0,16,0,16"/>
+                     Margin="0,16,0,16">
+            <hc:ComboBox.ToolTip>
+                <TextBlock>每台打印机仅能添加一次，重复添加会添加失败！</TextBlock>
+            </hc:ComboBox.ToolTip>
+        </hc:ComboBox>
 
         <!--提交按钮-->
-        <Button DockPanel.Dock="Bottom" Margin="0 8 0 16" Width="100">确定</Button>
+        <Button DockPanel.Dock="Bottom" Margin="0 8 0 16" Width="100" Click="OnSubmit">确定</Button>
 
         <!--价格配置-->
         <DockPanel Visibility="{Binding Path=ShowPricesTable}">
@@ -60,7 +64,7 @@
                 <!--打印机显示名称设置-->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 10">
                     <TextBlock VerticalAlignment="Center" Margin="0 0 44 0">打印机显示名称：</TextBlock>
-                    <TextBox Width="240" VerticalAlignment="Center" Margin="0 0 0 0"/>
+                    <TextBox Width="240" VerticalAlignment="Center" Name="DisplayName" Margin="0 0 0 0"/>
                     <StackPanel.ToolTip>
                         <TextBlock>打印机显示名称将被用于向消费者展示吗，留空为默认名称</TextBlock>
                     </StackPanel.ToolTip>
@@ -105,7 +109,8 @@
                         <SolidColorBrush Color="Black" Opacity="0.7"/>
                     </TextBlock.Foreground>
                     * 添加纸张并填写相应打印配置下的单张打印价格，点击确定提交<LineBreak/>
-                    * 未选择纸张的行将会在提交时自动忽略，您可使用DEL键删除选定行
+                    * 未选择纸张的行将会在提交时自动忽略，您可使用DEL键删除选定行<LineBreak/>
+                    * 每台打印机仅能添加一次，重复添加会添加失败！
                 </TextBlock>
                 <TextBlock Grid.Column="1"></TextBlock>
                 <Button Margin="0 8 8 0" HorizontalAlignment="Right"

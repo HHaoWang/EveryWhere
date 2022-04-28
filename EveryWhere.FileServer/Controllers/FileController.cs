@@ -9,11 +9,11 @@ namespace EveryWhere.FileServer.Controllers;
 [ApiController]
 public class FileController : ControllerBase
 {
-    [Route("Wps/{name}")]
+    [Route("Xps/{name}")]
     [HttpGet]
-    public IActionResult GetWpsFile(string name)
+    public IActionResult GetXpsFile(string name)
     {
-        FileInfo fileInfo = new(Path.Combine(FileUtil.GetWpsFileDirectory().FullName, name));
+        FileInfo fileInfo = new(Path.Combine(FileUtil.GetXpsFileDirectory().FullName, name+".xps"));
         try
         {
             FileStream stream = System.IO.File.OpenRead(fileInfo.FullName);
@@ -29,7 +29,7 @@ public class FileController : ControllerBase
     [HttpGet]
     public IActionResult GetPdfFile(string name)
     {
-        FileInfo fileInfo = new(Path.Combine(FileUtil.GetPdfFileDirectory().FullName, name));
+        FileInfo fileInfo = new(Path.Combine(FileUtil.GetPdfFileDirectory().FullName, name+".pdf"));
         try
         {
             FileStream stream = System.IO.File.OpenRead(fileInfo.FullName);

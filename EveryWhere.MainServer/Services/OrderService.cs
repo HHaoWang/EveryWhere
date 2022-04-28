@@ -172,11 +172,7 @@ public class OrderService:BaseService<Order>
     public async Task<Order> FinishPrintJob(int jobId)
     {
         PrintJob? job = await Repository.PrintJobs!
-            .Include(j => j.Order)
-            .ThenInclude(o=>o!.Consumer)
-            .Include(j=> j.Order)
-            .ThenInclude(o=>o!.Shop)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(j=>j.Id == jobId);
         if (job == null)
         {
             throw new EntityNotFoundException("打印任务", jobId);
@@ -188,13 +184,34 @@ public class OrderService:BaseService<Order>
 
         job.IsFinished = true;
         job.FetchCode = fetchCode;
+
+        Order? order = await _repository.Orders!
+            .Include(o=>o.PrintJobs)
+            .Include(o=>o.Consumer)
+            .Include(o=>o.Shop)
+            .FirstOrDefaultAsync(o => o.Id == job.OrderId);
+
+        bool allFinished = true;
+        foreach (PrintJob printJob in order!.PrintJobs!)
+        {
+            if (printJob.IsFinished != true)
+            {
+                allFinished = false;
+            }
+        }
+
+        if (allFinished)
+        {
+            order.State = Order.OrderState.Finished;
+            order.CompleteTime = DateTime.Now;
+        }
         
 
         await Repository.SaveChangesAsync();
 
-        await PushNotification(job.Order!.Consumer!.WechatOpenId ?? "", job.Order, job);
+        await PushNotification(order!.Consumer!.WechatOpenId ?? "", order, job);
 
-        return job.Order;
+        return order;
     }
 
     /// <summary>
@@ -213,7 +230,7 @@ public class OrderService:BaseService<Order>
         {
             touser = targetUserOpenId,
             template_id = "f_qfrBzThpIfK8WwdSHymugm_PU63Ejc60THzfD_Hpg",
-            page = "order?id=" + order.Id,
+            page = "/pages/order/order?id=" + order.Id,
             miniprogram_state = _configuration["pushWechatCardOpenClientType"],
             data = new
             {

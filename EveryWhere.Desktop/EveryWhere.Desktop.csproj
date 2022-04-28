@@ -12,13 +12,21 @@
   <ItemGroup>
     <None Remove="Static\Img\add.png" />
     <None Remove="Static\Img\login.png" />
+    <None Remove="Static\Img\logo.png" />
     <None Remove="Static\Img\miniprogram_link.jpg" />
     <None Remove="Static\Img\printer-offline.png" />
     <None Remove="Static\Img\printer.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Static\Img\logo.ico" />
+    <Resource Include="Static\Img\logo.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="Static\Img\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -29,14 +37,6 @@
     <PackageReference Include="QRCoder" Version="1.4.3" />
     <PackageReference Include="QRCoder.Xaml" Version="1.4.3" />
     <PackageReference Include="System.Management" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Static\Img\logo.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -52,21 +52,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Static\Img\add.png">
+    <Content Include="Static\Img\add.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Static\Img\login.png">
+    </Content>
+    <Content Include="Static\Img\login.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Static\Img\miniprogram_link.jpg">
+    </Content>
+    <Content Include="Static\Img\miniprogram_link.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Static\Img\printer-offline.png">
+    </Content>
+    <Content Include="Static\Img\printer-offline.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Static\Img\printer.png">
+    </Content>
+    <Content Include="Static\Img\printer.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    </Content>
   </ItemGroup>
 
 </Project>

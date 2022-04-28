@@ -1,4 +1,6 @@
-﻿using EveryWhere.Database.PO;
+﻿using AutoMapper;
+using EveryWhere.Database.PO;
+using EveryWhere.DTO.Entity;
 using EveryWhere.MainServer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -64,5 +66,37 @@ public class PrinterController : ControllerBase
                 jobs
             }
         });
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Shopkeeper")]
+    public async Task<IActionResult> AddPrinter([FromBody] NewPrinter printer)
+    {
+        MapperConfiguration config = new(cfg
+            =>
+        {
+            cfg.CreateMap<NewPrinter.PaperSizePrice, Printer.PaperSizePrice>();
+            cfg.CreateMap<NewPrinter, Printer>();
+        });
+
+        Printer newPrinter = config.CreateMapper().Map<Printer>(printer);
+
+        int affectedRows = await _printerService.AddAsync(newPrinter);
+        if (affectedRows>0)
+        {
+            return new JsonResult(new
+            {
+                statusCode = 200
+            });
+        }
+
+        return new JsonResult(new
+        {
+            statusCode = 500,
+            message = "添加失败！"
+        })
+        {
+            StatusCode = 500
+        };
     }
 }
