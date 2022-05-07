@@ -111,11 +111,11 @@ public sealed class Printer:INotifyPropertyChanged
         return _jobIdList.Contains(jobId) || _printingJobs.ContainsKey(jobId);
     }
 
-    public void AddPrintJob(FileInfo file, int pageStart, int pageEnd, int count, bool color, bool duplex, string size,int jobId)
+    public bool AddPrintJob(FileInfo file, int pageStart, int pageEnd, int count, bool color, bool duplex, string size,int jobId)
     {
         if (_jobIdList.Contains(jobId))
         {
-            return;
+            return false;
         }
         _jobIdList.Add(jobId);
         PrintXps(file,pageStart,pageEnd,count,color,duplex,size);
@@ -126,8 +126,11 @@ public sealed class Printer:INotifyPropertyChanged
             if (jobInfo.TimeJobSubmitted.Subtract(submitTime) < TimeSpan.FromSeconds(3) && jobInfo.NumberOfPages == pageEnd - pageStart + 1)
             {
                 _printingJobs.Add(jobId,jobInfo);
+                return true;
             }
         }
+
+        return false;
     }
 
     /// <summary>
@@ -167,28 +170,24 @@ public sealed class Printer:INotifyPropertyChanged
             {
                 ticket.OutputColor = OutputColor.Color;
             }
-            else
+            else if (_capabilities?.OutputColorCapability.Contains(OutputColor.Grayscale) == true)
             {
                 ticket.OutputColor = OutputColor.Grayscale;
+            }
+            else
+            {
+                ticket.OutputColor = OutputColor.Monochrome;
             }
 
             //份数
             ticket.CopyCount = count;
 
             //纸张大小
-            switch (size)
-            {
-                case "A4":
-                    ticket.PageMediaSize =
-                        _capabilities?.PageMediaSizeCapability.FirstOrDefault(
-                            p => p.PageMediaSizeName == PageMediaSizeName.ISOA4) ?? ticket.PageMediaSize;
-                    break;
-                case "A3":
-                    ticket.PageMediaSize =
-                        _capabilities?.PageMediaSizeCapability.FirstOrDefault(
-                            p => p.PageMediaSizeName == PageMediaSizeName.ISOA3) ?? ticket.PageMediaSize;
-                    break;
-            }
+            PageMediaSizeName? sizeName = PaperSize.PaperSize.GetFrom(size);
+
+            ticket.PageMediaSize =
+                _capabilities?.PageMediaSizeCapability.FirstOrDefault(
+                    p => p.PageMediaSizeName == sizeName) ?? ticket.PageMediaSize;
 
             //打印范围
             SplitXpsIntoTemp(file,pageStart,pageEnd);

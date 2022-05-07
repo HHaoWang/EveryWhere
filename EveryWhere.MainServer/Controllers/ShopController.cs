@@ -4,7 +4,6 @@ using EveryWhere.Database.PO;
 using EveryWhere.MainServer.Entity.Request;
 using EveryWhere.MainServer.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -90,7 +89,6 @@ public class ShopController : ControllerBase
         int userId = Convert.ToInt32(HttpContext.User.FindFirst(c => c.Type.Equals("UserId", StringComparison.CurrentCultureIgnoreCase))?.Value);
         bool isManager = HttpContext.User.Claims.FirstOrDefault(c =>
             c.ValueType == ClaimTypes.Role && c.Value.Equals("Manager", StringComparison.CurrentCultureIgnoreCase)) != null;
-        _logger.LogInformation("123");
         MapperConfiguration config = new(cfg
             => cfg.CreateMap<PatchShopRequest, Shop>());
         Shop? newShop = config.CreateMapper().Map<Shop>(request);

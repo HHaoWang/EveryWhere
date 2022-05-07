@@ -84,5 +84,15 @@ public class Repository : DbContext
             .WithMany(a => a.Shops)
             .HasForeignKey(s => s.AreaCode)
             .HasPrincipalKey(a => a.AreaCode);
+
+        modelBuilder.Entity<PO.PrintJob>()
+            .HasOne(j => j.Printer)
+            .WithMany(p => p.PrintJobs)
+            .OnDelete(DeleteBehavior.SetNull);
+        
+        modelBuilder.Entity<PO.PrintJob>()
+            .HasOne(j => j.File)
+            .WithOne(f=>f.PrintJob)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

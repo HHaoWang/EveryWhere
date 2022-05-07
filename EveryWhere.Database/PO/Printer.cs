@@ -60,9 +60,9 @@ public class Printer:BasePO
     public string? SupportSizesJson { get; set; }
 
     [NotMapped]
-    public Dictionary<string,PaperSizePrice> SupportSizes
+    public Dictionary<string,PaperSizePrice>? SupportSizes
     {
-        get => JsonConvert.DeserializeObject<Dictionary<string, PaperSizePrice>>(SupportSizesJson??"{}")!;
+        get => JsonConvert.DeserializeObject<Dictionary<string, PaperSizePrice>>(SupportSizesJson??"")!;
         set => SupportSizesJson = JsonConvert.SerializeObject(value);
     }
 

@@ -317,11 +317,15 @@ public sealed partial class MainWindow:INotifyPropertyChanged
     /// <param name="printer">打印机</param>
     /// <param name="job">打印配置</param>
     /// <param name="file">要打印的文件</param>
-    private static void AddJobToPrinter(Printer printer, PrintJob job, FileInfo file)
+    private void AddJobToPrinter(Printer printer, PrintJob job, FileInfo file)
     {
         Debug.WriteLine("添加打印任务");
-        printer.AddPrintJob(file, job.PageStart!.Value, job.PageEnd!.Value,
+        bool addResult = printer.AddPrintJob(file, job.PageStart!.Value, job.PageEnd!.Value,
             job.Count!.Value, job.Color!.Value, job.Duplex!.Value, job.PageSize!,job.Id);
+        if (addResult)
+        {
+            StateText.Text = $"[{DateTime.Now}]收到新的打印任务！";
+        }
     }
 
     /// <summary>

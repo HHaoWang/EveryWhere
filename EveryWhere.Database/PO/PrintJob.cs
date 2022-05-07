@@ -32,7 +32,6 @@ public class PrintJob:BasePO
     [Comment("订单ID")]
     public int? OrderId { get; set; }
 
-    [Required]
     [Column("printer_id", TypeName = "int(11)")]
     [Comment("打印机ID")]
     public int? PrinterId { get; set; }

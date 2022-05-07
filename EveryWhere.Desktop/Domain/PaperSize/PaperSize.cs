@@ -62,4 +62,24 @@ public class PaperSize
 
         return mappedSizes;
     }
+
+    public static string GetFrom(PageMediaSizeName size)
+    {
+        return _sizeMap.TryGetValue(size, out string? name) ? name : size.ToString();
+    }
+
+    public static PageMediaSizeName? GetFrom(string size)
+    {
+        KeyValuePair<PageMediaSizeName, string> pair = _sizeMap.FirstOrDefault(p => p.Value.Equals(size, StringComparison.CurrentCultureIgnoreCase));
+        if (_sizeMap.ContainsValue(size))
+        {
+            return pair.Key;
+        }
+
+        if (Enum.TryParse(size, true, out PageMediaSizeName sizeName))
+        {
+            return sizeName;
+        }
+        return null;
+    }
 }

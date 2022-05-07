@@ -60,5 +60,7 @@ public class File:BasePO
     [ForeignKey("UploaderId")]
     public User? Uploader { get; set; }
 
+    public PrintJob? PrintJob { get; set; }
+
     #endregion
 }
