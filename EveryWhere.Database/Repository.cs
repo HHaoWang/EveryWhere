@@ -13,6 +13,7 @@ public class Repository : DbContext
     public virtual DbSet<PO.Printer>? Printers { get; set; }
     public virtual DbSet<PO.Shop>? Shops { get; set; }
     public virtual DbSet<PO.Area>? Areas { get; set; }
+    public virtual DbSet<PO.ShopView>? ShopViews { get; set; }
 
     public Repository() { }
 
@@ -77,6 +78,12 @@ public class Repository : DbContext
                 .HasDefaultValueSql("'00:00:00'");
             entity.Property(e => e.CloseTime)
                 .HasDefaultValueSql("'00:00:00'");
+        });
+
+        modelBuilder.Entity<PO.ShopView>(entity =>
+        {
+            entity.Property(e => e.CreateTime)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
         modelBuilder.Entity<PO.Shop>()

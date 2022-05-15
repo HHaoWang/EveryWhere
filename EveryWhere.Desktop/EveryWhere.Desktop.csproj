@@ -42,6 +42,7 @@
   <ItemGroup>
     <Folder Include="Domain\PaperSize\" />
     <Folder Include="Entity\Response\" />
+    <Folder Include="Entity\Dto\" />
     <Folder Include="UITools\Converters\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>

@@ -59,6 +59,8 @@ public class PrinterController : ControllerBase
         List<PrintJob> jobs = _printJobService
             .GetQuery(p => p.PrinterId == printerId && p.IsFinished != true)
             .Include(j=>j.File)
+            .Include(j=>j.Order)
+            .Where(j=>j.Order!.PayTime != null)
             .ToList();
         return new JsonResult(new
         {

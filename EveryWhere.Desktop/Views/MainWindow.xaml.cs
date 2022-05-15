@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using EveryWhere.Database.PO;
+using EveryWhere.Desktop.Entity.Dto;
 using EveryWhere.Desktop.Entity.Response;
 using EveryWhere.DTO.Entity;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -286,7 +287,7 @@ public sealed partial class MainWindow:INotifyPropertyChanged
         }
 
         MessageBox.Show("获取打印机打印任务失败！请重新启动或检查网络连接，若反复出现错误请联系支持人员。");
-        throw new Exception("获取打印机失败！");
+        throw new Exception("获取打印机打印任务失败！");
     }
 
     /// <summary>
@@ -344,11 +345,11 @@ public sealed partial class MainWindow:INotifyPropertyChanged
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="jobId">打印任务ID</param>
-    private async void OnFinishedPrintJob(object? sender, int jobId)
+    private async void OnFinishedPrintJob(object? sender, JobState jobState)
     {
-        Debug.WriteLine($"完成ID为{jobId}的打印任务！");
+        Debug.WriteLine($"完成ID为{jobState.JobId}的打印任务！");
         
-        string responseStr = await RequestAsync($"{BaseUrl}/api/Order/PrintJob/{jobId}/Finish", "", HttpMethod.Get,
+        string responseStr = await RequestAsync($"{BaseUrl}/api/Order/PrintJob/{jobState.JobId}/Finish", "", HttpMethod.Get,
             new List<(string, string)>()
             {
                 ("Authorization", "Bearer " + Application.Current.Properties["Token"])
@@ -356,7 +357,7 @@ public sealed partial class MainWindow:INotifyPropertyChanged
         BaseResponse<OrderResponse>? response = JsonConvert.DeserializeObject<BaseResponse<OrderResponse>>(responseStr);
         if (response is {StatusCode:200,Data.Order:not null})
         {
-            (sender as Printer)?.RemoveJob(jobId);
+            (sender as Printer)?.RemoveJob(jobState.JobId);
             return;
         }
         Debug.WriteLine("通知打印完成失败！");
@@ -395,6 +396,20 @@ public sealed partial class MainWindow:INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private void HandleRequestNavigate(object sender, RoutedEventArgs e)
+    {
+        string navigateUri = ShopPanelLink.NavigateUri.ToString();
+        
+        ProcessStartInfo sInfo = new(navigateUri)
+        {
+            UseShellExecute = true,
+        };
+        Process.Start(sInfo);
+
+        //Process.Start(new ProcessStartInfo(navigateUri));
+        e.Handled = true;
     }
 
     #endregion

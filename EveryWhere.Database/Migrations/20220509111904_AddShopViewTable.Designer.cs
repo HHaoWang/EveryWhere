@@ -3,6 +3,7 @@ using System;
 using EveryWhere.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EveryWhere.Database.Migrations
 {
     [DbContext(typeof(Repository))]
-    partial class RepositoryModelSnapshot : ModelSnapshot
+    [Migration("20220509111904_AddShopViewTable")]
+    partial class AddShopViewTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -500,9 +502,6 @@ namespace EveryWhere.Database.Migrations
                         .HasComment("微信下发的unionId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("WechatOpenId")
-                        .IsUnique();
 
                     b.ToTable("user");
                 });

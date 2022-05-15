@@ -48,7 +48,9 @@ public partial class LoginWindow
     private async void CheckIsLogin(object? sender, EventArgs e)
     {
         string checkValidUrl = $"https://everywhere.hhao.wang/api/Login/QRCode/{_currentUuid}/Valid";
-        string loginInfoResponseStr = await _httpClient.GetStringAsync(checkValidUrl);
+        HttpResponseMessage response =
+            await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, checkValidUrl));
+        string loginInfoResponseStr = await response.Content.ReadAsStringAsync();
         BaseResponse<CheckLoginValidResponse>? loginInfoResponse = JsonConvert
             .DeserializeObject<BaseResponse<CheckLoginValidResponse>>(loginInfoResponseStr);
         if (loginInfoResponse?.StatusCode!=200)

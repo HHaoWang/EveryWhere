@@ -13,6 +13,7 @@ using System.Windows.Documents;
 using System.Windows.Xps;
 using System.Windows.Xps.Packaging;
 using System.Windows.Markup;
+using EveryWhere.Desktop.Entity.Dto;
 
 namespace EveryWhere.Desktop.Domain.Printer;
 
@@ -47,7 +48,7 @@ public sealed class Printer:INotifyPropertyChanged
 
     public string DisplayImg => IsOffline ? "/Static/Img/printer-offline.png" : "/Static/Img/printer.png";
 
-    public event EventHandler<int>? OnJobFinished; 
+    public event EventHandler<JobState>? OnJobFinished; 
 
     #endregion
 
@@ -111,6 +112,18 @@ public sealed class Printer:INotifyPropertyChanged
         return _jobIdList.Contains(jobId) || _printingJobs.ContainsKey(jobId);
     }
 
+    /// <summary>
+    /// 添加xps文件打印任务
+    /// </summary>
+    /// <param name="file">xps文件</param>
+    /// <param name="pageStart">起始页</param>
+    /// <param name="pageEnd">结束页</param>
+    /// <param name="count">份数</param>
+    /// <param name="color">是否彩印</param>
+    /// <param name="duplex">是否正反印刷</param>
+    /// <param name="size">纸张大小</param>
+    /// <param name="jobId">任务ID</param>
+    /// <returns>添加打印任务是否成功</returns>
     public bool AddPrintJob(FileInfo file, int pageStart, int pageEnd, int count, bool color, bool duplex, string size,int jobId)
     {
         if (_jobIdList.Contains(jobId))
@@ -118,19 +131,17 @@ public sealed class Printer:INotifyPropertyChanged
             return false;
         }
         _jobIdList.Add(jobId);
-        PrintXps(file,pageStart,pageEnd,count,color,duplex,size);
-        DateTime submitTime = DateTime.Now.ToUniversalTime();
-        PrintJobInfoCollection? infoCollection = _queue!.GetPrintJobInfoCollection();
-        foreach (PrintSystemJobInfo jobInfo in infoCollection)
-        {
-            if (jobInfo.TimeJobSubmitted.Subtract(submitTime) < TimeSpan.FromSeconds(3) && jobInfo.NumberOfPages == pageEnd - pageStart + 1)
-            {
-                _printingJobs.Add(jobId,jobInfo);
-                return true;
-            }
-        }
 
-        return false;
+        PrintXps(file,pageStart,pageEnd,count,color,duplex,size,$"EveryWhereJob.{jobId}");
+        _queue!.Refresh();
+        PrintJobInfoCollection? infoCollection = _queue!.GetPrintJobInfoCollection();
+        PrintSystemJobInfo? jobInfo = infoCollection.FirstOrDefault(j => j.Name == $"EveryWhereJob.{jobId}");
+        if (jobInfo is null)
+        {
+            return false;
+        }
+        _printingJobs.Add(jobId,jobInfo);
+        return true;
     }
 
     /// <summary>
@@ -143,7 +154,8 @@ public sealed class Printer:INotifyPropertyChanged
     /// <param name="color">是否彩印</param>
     /// <param name="duplex">是否正反印刷</param>
     /// <param name="size">纸张大小</param>
-    private void PrintXps(FileInfo file,int pageStart,int pageEnd,int count,bool color,bool duplex,string size)
+    /// <param name="jobName">任务名称</param>
+    private void PrintXps(FileInfo file,int pageStart,int pageEnd,int count,bool color,bool duplex,string size,string jobName)
     {
         try
         {
@@ -179,6 +191,9 @@ public sealed class Printer:INotifyPropertyChanged
                 ticket.OutputColor = OutputColor.Monochrome;
             }
 
+            //打印质量设置
+            ticket.OutputQuality = _capabilities?.OutputQualityCapability.Contains(OutputQuality.High) == true ? OutputQuality.High : OutputQuality.Automatic;
+
             //份数
             ticket.CopyCount = count;
 
@@ -195,19 +210,11 @@ public sealed class Printer:INotifyPropertyChanged
             XpsDocument xpsFile = new(file.FullName + ".temp", FileAccess.Read);
 
             XpsDocumentWriter writer = PrintQueue.CreateXpsDocumentWriter(_queue);
+            _queue.CurrentJobSettings.CurrentPrintTicket = ticket;
+            _queue.CurrentJobSettings.Description = jobName;
             writer.Write(xpsFile.GetFixedDocumentSequence(),ticket);
-
-            //PrintSystemJobInfo? jobInfo = _queue?.AddJob(file.Name, file.FullName + ".temp", _queue.IsXpsDevice);
+            
             Debug.WriteLine("添加打印任务到队列完成");
-
-            //if (jobInfo==null)
-            //{
-            //    Debug.WriteLine("添加打印任务失败！");
-            //    return;
-            //}
-
-            //jobInfo.Refresh();
-            //JobInfos.Add(jobInfo);
         }
         catch (PrintJobException e)
         {
@@ -270,14 +277,47 @@ public sealed class Printer:INotifyPropertyChanged
         xpsOutputDoc.Close();
     }
 
+    /// <summary>
+    /// 检查各打印任务状态
+    /// </summary>
     public void CheckJobsState()
     {
-        foreach (KeyValuePair<int, PrintSystemJobInfo> pair in _printingJobs)
+        List<int> deletedJobIds = new();
+        List<JobState> jobStates = new();
+        foreach ((int jobId, PrintSystemJobInfo? jobInfo) in _printingJobs)
         {
-            pair.Value.Refresh();
-            if (!pair.Value.IsDeleted && !pair.Value.IsCompleted) continue;
-            Debug.WriteLine("检测到打印任务已完成");
-            OnJobFinished?.Invoke(this, pair.Key);
+            jobInfo.Refresh();
+
+            if (jobInfo.IsCompleted || jobInfo.IsDeleted)
+            {
+                jobStates.Add(new JobState()
+                {
+                    JobId = jobId,
+                    State = JobState.Status.Finished
+                });
+            }
+
+            //完成的任务预备进行通知
+            //if ((jobInfo.JobStatus & PrintJobStatus.Completed) == PrintJobStatus.Completed
+            //    ||
+            //    (jobInfo.JobStatus & PrintJobStatus.Printed) == PrintJobStatus.Printed)
+            //{
+            //    jobStates.Add(new JobState()
+            //    {
+            //        JobId = jobId,
+            //        State = JobState.Status.Finished
+            //    });
+            //}
+        }
+
+        foreach (int deletedJobId in deletedJobIds)
+        {
+            _printingJobs.Remove(deletedJobId);
+        }
+
+        foreach (JobState jobState in jobStates)
+        {
+            OnJobFinished?.Invoke(this,jobState);
         }
     }
 

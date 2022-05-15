@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 namespace EveryWhere.Database.PO;
 
 [Table("user")]
+[Index(nameof(WechatOpenId),IsUnique = true)]
 public class User:BasePO
 {
     [Required]

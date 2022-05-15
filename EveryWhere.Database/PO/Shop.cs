@@ -73,5 +73,7 @@ public class Shop:BasePO
     
     public Area? Area { get; set; }
 
+    public List<Order>? Orders { get; set; }
+
     #endregion
 }

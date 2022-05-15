@@ -103,6 +103,7 @@ builder.Services.AddScoped<FileService, FileService>();
 builder.Services.AddScoped<OrderService, OrderService>();
 builder.Services.AddScoped<PrinterService, PrinterService>();
 builder.Services.AddScoped<PrintJobService, PrintJobService>();
+builder.Services.AddScoped<ShopViewService, ShopViewService>();
 builder.Services.AddScoped<Publisher, Publisher>();
 
 builder.Services.AddSingleton<Hub,Hub>();

@@ -109,6 +109,7 @@
                         <SolidColorBrush Color="Black" Opacity="0.7"/>
                     </TextBlock.Foreground>
                     * 添加纸张并填写相应打印配置下的单张打印价格，点击确定提交<LineBreak/>
+                    * 价格必须为有效的数字，否则将以0元价格提交，您可在商家后台修改价格<LineBreak/>
                     * 未选择纸张的行将会在提交时自动忽略，您可使用DEL键删除选定行<LineBreak/>
                     * 每台打印机仅能添加一次，重复添加会添加失败！
                 </TextBlock>

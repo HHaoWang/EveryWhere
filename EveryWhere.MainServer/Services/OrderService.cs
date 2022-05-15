@@ -101,7 +101,7 @@ public class OrderService:BaseService<Order>
             throw new EntityNotFoundException("打印机",ticket.PrinterId);
         }
 
-        //检查打印机是否支持打印选型
+        //检查打印机是否支持打印选项
         if (ticket.Color && printer.SupportColor != true)
         {
             throw new PrinterNotSupportTicketException(ticket.PrinterId, "彩色");
@@ -112,16 +112,19 @@ public class OrderService:BaseService<Order>
             throw new PrinterNotSupportTicketException(ticket.PrinterId, "双面打印");
         }
 
-        bool exist = printer.SupportSizes.TryGetValue(ticket.Size!, out PaperSizePrice sizePrices);
+        bool exist = printer.SupportSizes!.TryGetValue(ticket.Size!, out PaperSizePrice sizePrices);
 
         if (!exist)
         {
             throw new PrinterNotSupportTicketException(ticket.PrinterId, ticket.Size + "纸张大小");
         }
 
-        //计算总价
+        #region 计算总价
+
+        //打印页数
         int totalPagesCount = ticket.PagesEnd - ticket.PagesStart + 1;
 
+        //单张价格
         decimal singlePagePrice;
 
         if (ticket.Color)
@@ -133,7 +136,14 @@ public class OrderService:BaseService<Order>
             singlePagePrice = ticket.Duplex ? sizePrices.DuplexBlack : sizePrices.SingleBlack;
         }
 
-        decimal totalPrice = singlePagePrice * totalPagesCount * ticket.Count;
+        //单份价格 = ceil(页面数/2) * 单张价格
+        decimal singlePrice = singlePagePrice *
+                             (ticket.Duplex ? Math.Ceiling((decimal) totalPagesCount / 2) : totalPagesCount);
+
+        decimal totalPrice = singlePrice * ticket.Count;
+
+        #endregion
+
 
         return totalPrice;
     }
@@ -187,6 +197,7 @@ public class OrderService:BaseService<Order>
 
         Order? order = await _repository.Orders!
             .Include(o=>o.PrintJobs)
+            !.ThenInclude(j=>j.File)
             .Include(o=>o.Consumer)
             .Include(o=>o.Shop)
             .FirstOrDefaultAsync(o => o.Id == job.OrderId);
@@ -205,7 +216,6 @@ public class OrderService:BaseService<Order>
             order.State = Order.OrderState.Finished;
             order.CompleteTime = DateTime.Now;
         }
-        
 
         await Repository.SaveChangesAsync();
 
@@ -223,17 +233,24 @@ public class OrderService:BaseService<Order>
     /// <returns>推送结果</returns>
     public async Task<bool> PushNotification(string targetUserOpenId, Order order, PrintJob printJob)
     {
+        string fileName = printJob.File!.OriginalName ?? "您打印的文件";
+        fileName = fileName.Length > 20 ? fileName.Substring(0, 20) : fileName;
+
         string requestUrl =
             $"https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token={await GetAccessToken()}";
         HttpClient? client = _clientFactory.CreateClient();
         var content = new
         {
             touser = targetUserOpenId,
-            template_id = "f_qfrBzThpIfK8WwdSHymugm_PU63Ejc60THzfD_Hpg",
+            template_id = "f_qfrBzThpIfK8WwdSHymrz0YBiL13htL_dG1R3zQkE",
             page = "/pages/order/order?id=" + order.Id,
             miniprogram_state = _configuration["pushWechatCardOpenClientType"],
             data = new
             {
+                thing1 = new
+                {
+                    value = fileName
+                },
                 name3 = new
                 {
                     value = order.Shop!.Name
@@ -242,17 +259,13 @@ public class OrderService:BaseService<Order>
                 {
                     value = order.Shop!.Address
                 },
+                character_string17 = new
+                {
+                    value = Convert.ToInt32(printJob.FetchCode)
+                },
                 phrase4 = new
                 {
                     value = printJob.IsFinished == true ? "已打印" : "打印中"
-                },
-                time5 = new
-                {
-                    value = printJob.CreateTime!.Value.ToString("HH:mm")
-                },
-                number12 = new
-                {
-                    value = Convert.ToInt32(printJob.FetchCode)
                 }
             }
         };

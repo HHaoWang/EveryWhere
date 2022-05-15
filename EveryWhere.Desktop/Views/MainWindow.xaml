@@ -96,11 +96,18 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Ellipse Height="14" Width="14" Fill="LawnGreen" Name="StateLight"
                      Margin="8 0 4 0" Grid.Column="0"></Ellipse>
             <TextBlock VerticalAlignment="Center" Grid.Column="1" Name="StateText">连接服务器成功！</TextBlock>
             <TextBlock VerticalAlignment="Center" Grid.Column="3" Margin="0 0 8 0" Name="ShopName"></TextBlock>
+            <TextBlock VerticalAlignment="Center" Grid.Column="4">
+                <Hyperlink NavigateUri="http://everywhere.hhao.wang"
+                           RequestNavigate="HandleRequestNavigate" Name="ShopPanelLink" >
+                    商家端
+                </Hyperlink>
+            </TextBlock>
             <TextBlock Width="auto" Grid.Column="2"></TextBlock>
         </Grid>
 

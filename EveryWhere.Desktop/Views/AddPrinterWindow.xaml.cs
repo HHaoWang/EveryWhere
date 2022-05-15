@@ -197,6 +197,11 @@ public sealed partial class AddPrinterWindow:INotifyPropertyChanged
 
     private async void OnSubmit(object sender, RoutedEventArgs e)
     {
+        if (CurrentPrinter is null || Prices.Count < 1 || Prices.Any(p=>p.Size is null))
+        {
+            MessageBox.Show("请选择一台打印机并添加纸张及对应价格！");
+            return;
+        }
         Dictionary<string, NewPrinter.PaperSizePrice> size = new();
         foreach (PrinterPrice printerPrice in Prices)
         {
